@@ -1542,6 +1542,7 @@
 #app-diet .cal-cell.sun .cal-daynum {color:var(--clay);}
 #app-diet .cal-hol {font-size:clamp(6.5px,2vw,8.5px);color:var(--clay);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #app-diet .cal-weight {font-size:clamp(6.5px,1.9vw,8.5px);color:var(--mustard);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#app-diet .cal-weight-diff {font-size:clamp(6px,1.6vw,7.5px); font-weight:800; margin-left:1px;}
 #app-diet .cal-kcal {font-size:clamp(6.5px,1.9vw,8.5px);color:var(--sage-deep);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-diet .cal-ratio {font-size:clamp(6px,1.7vw,8px);color:var(--sub);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto;}
 
@@ -7150,6 +7151,7 @@ function renderFoods(){
           <td class="col-cal">${fmt(f.cal)}</td>
           <td class="col-act">
             <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
+              <button class="icon-btn fav" onclick="saveFoodItemAsFav(${f.idx})" title="즐겨찾기에 저장">⭐</button>
               <button class="icon-btn edit" onclick="editFood(${f.idx})" title="수정">✎</button>
               <button class="icon-btn del" onclick="removeFood(${f.idx})" title="삭제">✕</button>
             </div>
@@ -7204,6 +7206,19 @@ function saveFav(){
   clearTimeout(window._favMsgTimer);
   window._favMsgTimer = setTimeout(()=>{ msg.style.display='none'; }, 2500);
 }
+
+function saveFoodItemAsFav(i){
+  const f = dayData.foods[i];
+  if(!f) return;
+  favs.push({name:f.name, carb:f.carb||0, protein:f.protein||0, fat:f.fat||0, sodium:f.sodium||0, cal:f.cal});
+  saveFavs(); renderFavPanel();
+  const msg = document.getElementById('favSavedMsg');
+  msg.textContent = `⭐ ${f.name} 저장 완료!`;
+  msg.style.display = 'block';
+  clearTimeout(window._favMsgTimer);
+  window._favMsgTimer = setTimeout(()=>{ msg.style.display='none'; }, 2500);
+}
+
 function toggleFavPanel(){ document.getElementById('favModal').classList.toggle('open'); }
 function useFav(i){
   const f = favs[i];
@@ -7386,8 +7401,30 @@ async function calRenderMonthData(year, month){
       }
     }
   }catch(e){}
+
+  // 전날 대비 몸무게 증감 계산
+  const weightDates = Object.keys(map).filter(d=>map[d].weight);
+  for(const dISO of weightDates){
+    const prevISO = toISO(addDays(fromISO(dISO), -1));
+    let prevWeight = null;
+    if(map[prevISO] && map[prevISO].weight){
+      prevWeight = parseFloat(map[prevISO].weight);
+    } else {
+      try{
+        const r = await window.storage.get('diet:day:'+prevISO, false);
+        if(r && r.value){
+          const pd = JSON.parse(r.value);
+          if(pd.weight) prevWeight = parseFloat(pd.weight);
+        }
+      }catch(e){}
+    }
+    if(prevWeight!==null && !isNaN(prevWeight)){
+      map[dISO].weightDiff = parseFloat(map[dISO].weight) - prevWeight;
+    }
+  }
   return map;
 }
+
 async function renderCalendarMonth(){
   const year = calMonthDate.getFullYear();
   const month = calMonthDate.getMonth();
@@ -7413,7 +7450,7 @@ async function renderCalendarMonth(){
     html += `<div class="cal-cell ${isSun?'sun':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-iso="${dISO}" onclick="calPickDate('${dISO}')">
       <span class="cal-daynum">${day}</span>
       ${hol?`<span class="cal-hol">${hol}</span>`:''}
-      ${info && info.weight?`<span class="cal-weight">${info.weight}kg</span>`:''}
+      ${info && info.weight?`<span class="cal-weight">${info.weight}kg${info.weightDiff!==undefined ? `<span class="cal-weight-diff" style="color:${info.weightDiff>0?'var(--blue)':(info.weightDiff<0?'var(--clay)':'var(--sub)')};">(${info.weightDiff>0?'+':''}${info.weightDiff.toFixed(1)})</span>` : ''}</span>`:''}
       ${info && info.kcal?`<span class="cal-kcal">${Math.round(info.kcal)}kcal</span>`:''}
       ${info && info.ratio?`<span class="cal-ratio">${info.ratio}</span>`:''}
     </div>`;
@@ -7454,6 +7491,7 @@ window.cancelFoodInlineEdit = cancelFoodInlineEdit;
 window.saveFoodInlineEdit = saveFoodInlineEdit;
 window.removeFood = removeFood;
 window.saveFav = saveFav;
+window.saveFoodItemAsFav = saveFoodItemAsFav;
 window.toggleFavPanel = toggleFavPanel;
 window.useFav = useFav;
 window.editFav = editFav;
