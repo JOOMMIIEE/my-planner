@@ -178,6 +178,22 @@
     cursor:pointer; padding:0;
   }
 #app-planner .color-popover .swatch:hover { transform:scale(1.14); }
+#app-planner .subitem-popover {
+    position:fixed; display:none; z-index:120;
+    background:#f3f1ea; border:1px solid var(--grid); border-radius:10px;
+    box-shadow:0 8px 24px rgba(20,25,45,0.16);
+    padding:8px 6px 8px 10px; max-height:320px; overflow-y:auto;
+    box-sizing:border-box;
+  }
+#app-planner .subitem-popover-title {
+    font-size:11.5px; font-weight:800; color:var(--navy); margin-bottom:6px; padding:0 4px 0 0;
+  }
+#app-planner .subitem-popover-addbtn {
+    border:1px dashed var(--grid); background:none; color:var(--muted); font-size:12px;
+    cursor:pointer; padding:6px 8px; border-radius:7px; width:100%; text-align:center; margin-top:4px;
+  }
+#app-planner .subitem-popover-addbtn:hover { background:rgba(0,0,0,0.04); color:var(--navy); }
+#app-planner .subitem-popover-empty { font-size:11.5px; color:#a7adc0; padding:6px 4px; }
 #app-planner .confirm-overlay {
     position:fixed; inset:0; background:rgba(20,25,45,0.42);
     display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
@@ -1512,14 +1528,20 @@
 #app-diet .inline-edit-row input, #app-diet .inline-edit-row select {height:34px;font-size:12.5px;padding:0 6px;}
 #app-diet .inline-edit-actions {display:flex;gap:4px;justify-content:flex-end;}
 #app-diet .etext {
-    display:inline-block;min-width:16px;outline:none;border-bottom:1.5px dashed var(--sage);
-    background:var(--sage-light);border-radius:3px;padding:1px 3px;font:inherit;color:inherit;
+    display:inline-block;min-width:16px;outline:none;border-bottom:1.5px dashed var(--line);
+    padding:1px 2px;font:inherit;color:inherit;
   }
-#app-diet .etext:focus {background:#fff;}
+#app-diet .etext:focus {border-bottom-color:var(--sage);}
 #app-diet select.etext-meal {
     width:auto;height:22px;padding:0 2px;font-size:10.5px;border:1px solid var(--line);border-radius:5px;
     background:var(--cream);margin-right:2px;vertical-align:middle;
   }
+#app-diet .diet-meal-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:22px; border-radius:6px; font-size:11px; font-weight:700;
+    cursor:pointer; flex-shrink:0; user-select:none;
+  }
+#app-diet .diet-meal-badge:hover { filter:brightness(0.95); }
 #app-diet input.etext-date {
     width:100%;box-sizing:border-box;height:24px;padding:0 3px;font-size:11px;border:1px solid var(--sage);border-radius:4px;
     background:var(--sage-light);
@@ -1537,20 +1559,22 @@
 #app-diet .cal-dow-row span {font-size:11px;color:var(--sub);font-weight:700;}
 #app-diet .cal-dow-row span.sun {color:var(--clay);}
 #app-diet .cal-grid {display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-#app-diet .cal-cell {min-height:68px;border-radius:9px;padding:4px 3px;cursor:pointer;background:var(--cream);display:flex;flex-direction:column;gap:1px;overflow:hidden;border:1.5px solid transparent;}
+#app-diet .cal-cell {min-height:68px;border-radius:9px;padding:7px 6px;cursor:pointer;background:var(--cream);display:flex;flex-direction:column;gap:1px;overflow:hidden;border:1.5px solid transparent;box-sizing:border-box;}
 #app-diet .cal-cell:hover {background:var(--sage-light);}
 #app-diet .cal-cell.blank {visibility:hidden;cursor:default;}
-#app-diet .cal-cell.today {border-color:var(--sage);}
+#app-diet .cal-cell.today {box-shadow:inset 0 0 0 2px var(--sage); font-weight:800;}
 #app-diet .cal-cell.holiday .cal-daynum {color:var(--clay);}
-#app-diet .cal-cell.selected {background:#C9E2CB;}
 #app-diet .cal-daynum {font-size:clamp(10px,3vw,12.5px);font-weight:800;color:#2a3142;}
 #app-diet .cal-cell.sun .cal-daynum {color:var(--clay);}
+#app-diet .cal-daynum-row {display:flex; align-items:center; justify-content:space-between; gap:2px;}
+#app-diet .cal-weight-diff {
+  font-size:clamp(6px,1.6vw,7.5px); font-weight:800;
+  border-radius:8px; padding:1px 5px; white-space:nowrap; flex-shrink:0;
+}
+#app-diet .cal-weight-diff.loss {background:#FBE1EC; color:#B3436B;}
+#app-diet .cal-weight-diff.gain {background:#DCEBFA; color:#2E6299;}
 #app-diet .cal-hol {font-size:clamp(6.5px,2vw,8.5px);color:var(--clay);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #app-diet .cal-weight {font-size:clamp(6.5px,1.9vw,8.5px);color:var(--mustard);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#app-diet .cal-weight-diff {
-  font-size:clamp(6px,1.6vw,7.5px); font-weight:800; margin-left:2px;
-  background:rgba(255,255,255,.9); border-radius:5px; padding:0 3px;
-}
 #app-diet .cal-kcal {font-size:clamp(6.5px,1.9vw,8.5px);color:var(--sage-deep);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-diet .cal-ratio {font-size:clamp(6px,1.7vw,8px);color:var(--sub);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto;}
 
@@ -1654,9 +1678,6 @@
         <span>PROJECT</span>
         <div style="display:flex; gap:6px;">
           <button class="headbtn headbtn-copy" data-action="m-copy-prev-cat" title="이전 주 카테고리 가져오기"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>이전주</button>
-          <button class="headbtn headbtn-expandall" id="mExpandAllBtn" data-action="m-toggle-all-subitems" title="하위목록 전체 펼치기/접기">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
-          </button>
           <button class="headbtn m-catsettings-addbtn" data-action="m-add-cat" title="카테고리 추가">+</button>
         </div>
       </div>
@@ -1697,6 +1718,7 @@
 </div>
 
 <div class="color-popover" id="colorPopover"></div>
+<div class="subitem-popover" id="subitemPopover"></div>
 
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
@@ -2600,24 +2622,8 @@
     if(!targetCat){ srcCat.items.splice(fromIdx,0,moved); return; }
     targetCat.items.push(moved);
   }
-  const expandedItemIds = new Set();
-  let allSubitemsOpen = false; // 전체 펼치기/접기 버튼의 마지막 상태
-
-  function toggleAllSubitems(){
-    allSubitemsOpen = !allSubitemsOpen;
-    if(allSubitemsOpen){
-      state.categories.forEach(cat=>{
-        cat.items.forEach(it=>{
-          if(it.subitems && it.subitems.length > 0){
-            expandedItemIds.add(it.id);
-          }
-        });
-      });
-    } else {
-      expandedItemIds.clear();
-    }
-    renderAll();
-  }
+  const expandedItemIds = new Set(); // 모바일 전용: 인라인으로 펼친 항목들
+  let openSubitemItemId = null; // 데스크톱 전용: 현재 팝오버가 열린 항목 id
 
   const titleEl = document.getElementById('titleText');
   const subRangeEl = document.getElementById('subRange');
@@ -2666,6 +2672,8 @@
       pendingConfirmCallback = null;
     } else if(eventOverlayEl.style.display === 'flex'){
       closeEventModal();
+    } else if(subitemPopoverEl.style.display === 'block'){
+      closeSubitemPopover();
     }
   });
 
@@ -2954,7 +2962,8 @@
       setStatus('');
     }
     expandedItemIds.clear();
-    allSubitemsOpen = false;
+    openSubitemItemId = null;
+    closeSubitemPopover();
     memoUndoStack = [];
     clearTimeout(memoCheckpointTimer);
     memoCheckpointTimer = null;
@@ -3053,7 +3062,7 @@
     const monday = fromISO(state.weekStart);
     let html = '';
 
-    html += `<div class="head-project"><span>PROJECT</span><div style="display:flex; gap:4px;"><button class="headbtn headbtn-copy" data-action="copy-prev-cat" title="이전 주 카테고리 가져오기"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>이전주</button><button class="headbtn headbtn-expandall ${allSubitemsOpen?'all-open':''}" data-action="toggle-all-subitems" title="하위목록 전체 펼치기/접기"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg></button><button class="headbtn" data-action="add-cat" title="카테고리 추가">+</button></div></div>`;
+    html += `<div class="head-project"><span>PROJECT</span><div style="display:flex; gap:4px;"><button class="headbtn headbtn-copy" data-action="copy-prev-cat" title="이전 주 카테고리 가져오기"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>이전주</button><button class="headbtn" data-action="add-cat" title="카테고리 추가">+</button></div></div>`;
     for(let i=0;i<5;i++){
       const d = addDays(monday,i);
       const dISOh = toISO(d);
@@ -3092,14 +3101,13 @@
       html += `<div class="cat-goal" data-cat="${cat.id}"><span class="goal-label">Goal</span><span class="goal-text" contenteditable="true" data-cat="${cat.id}"></span></div>`;
 
       cat.items.forEach(item=>{
-        const expanded = expandedItemIds.has(item.id);
-        const subs = item.subitems || [];
+        const isPopoverOpen = openSubitemItemId === item.id;
         html += `<div class="item-row-name" data-item="${item.id}">
           <span class="item-dot" draggable="true" data-item="${item.id}" data-cat="${cat.id}" title="끌어서 순서/카테고리 이동">|</span>
           <span class="itemtext" contenteditable="true" data-item="${item.id}"></span>
           <span class="item-actions">
-            <button class="item-addsub-btn ${expanded?'':'hidden-btn'}" data-action="add-subitem" data-item="${item.id}" title="하위목록 추가">+</button>
-            <button class="item-expand-btn ${expanded?'open':''}" data-action="toggle-subitems" data-item="${item.id}" title="하위목록"><svg width="11" height="11" viewBox="0 0 12 12"><polygon points="2,4 10,4 6,9" fill="currentColor"/></svg></button>
+            <span></span>
+            <button class="item-expand-btn ${isPopoverOpen?'open':''}" data-action="toggle-subitems" data-item="${item.id}" title="하위목록"><svg width="11" height="11" viewBox="0 0 12 12"><polygon points="2,4 10,4 6,9" fill="currentColor"/></svg></button>
             <button class="item-del-btn" data-action="del-item" data-item="${item.id}" data-cat="${cat.id}" title="항목 삭제">✕</button>
           </span>
         </div>`;
@@ -3107,15 +3115,6 @@
           const built = buildDayCellHtml(item.id, d);
           html += built.checkStack;
           html += built.noteStack;
-        }
-        if(expanded && subs.length>0){
-          html += `<div class="subitem-panel" data-item="${item.id}"><div class="subitem-box">
-            ${subs.map(s=>`<div class="subitem-row" data-item="${item.id}" data-sub="${s.id}">
-              <span class="subitem-bullet" draggable="true" data-item="${item.id}" data-sub="${s.id}" title="끌어서 순서 이동">·</span>
-              <span class="subitem-text" contenteditable="true" data-action="subitem-text" data-item="${item.id}" data-sub="${s.id}">${escapeHtml(s.text)}</span>
-              <button class="subitem-del" data-action="del-subitem" data-item="${item.id}" data-sub="${s.id}" title="삭제">✕</button>
-            </div>`).join('')}
-          </div></div>`;
         }
       });
 
@@ -3152,6 +3151,10 @@
     enableEditExpand('.subitem-text', 12, 8);
     enableEditExpand('.goal-text', 12.5, 8);
     enableEditExpand('.note-cell', 12.5, 8);
+
+    if(openSubitemItemId && subitemPopoverEl.style.display === 'block'){
+      renderSubitemPopoverContent(openSubitemItemId);
+    }
   }
 
   function syncWeekendColumnWidth(){
@@ -3206,10 +3209,6 @@
     const copyPrevBtn = gridEl.querySelector('[data-action="copy-prev-cat"]');
     if(copyPrevBtn){
       copyPrevBtn.addEventListener('click', copyPrevWeekCategories);
-    }
-    const expandAllBtnDesktop = gridEl.querySelector('[data-action="toggle-all-subitems"]');
-    if(expandAllBtnDesktop){
-      expandAllBtnDesktop.addEventListener('click', toggleAllSubitems);
     }
 
     gridEl.querySelectorAll('[data-action="cycle"]').forEach(el=>{
@@ -3301,56 +3300,11 @@
       el.addEventListener('click', (e)=>{
         e.stopPropagation();
         const id = el.dataset.item;
-        if(expandedItemIds.has(id)){
-          expandedItemIds.delete(id);
+        if(openSubitemItemId === id){
+          closeSubitemPopover();
         } else {
-          expandedItemIds.add(id);
-          for(const cat of state.categories){
-            const it = cat.items.find(i=>i.id===id);
-            if(it){
-              if(!it.subitems) it.subitems = [];
-              if(it.subitems.length===0) it.subitems.push({id:uid(), text:''});
-              break;
-            }
-          }
+          openSubitemPopover(el, id);
         }
-        renderAll();
-      });
-    });
-    gridEl.querySelectorAll('[data-action="add-subitem"]').forEach(el=>{
-      el.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        for(const cat of state.categories){
-          const it = cat.items.find(i=>i.id===el.dataset.item);
-          if(it){ if(!it.subitems) it.subitems=[]; it.subitems.push({id:uid(), text:''}); break; }
-        }
-        renderAll();
-      });
-    });
-    gridEl.querySelectorAll('[data-action="del-subitem"]').forEach(el=>{
-      el.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        for(const cat of state.categories){
-          const it = cat.items.find(i=>i.id===el.dataset.item);
-          if(it && it.subitems){
-            it.subitems = it.subitems.filter(s=>s.id!==el.dataset.sub);
-            if(it.subitems.length===0) expandedItemIds.delete(el.dataset.item);
-            break;
-          }
-        }
-        renderAll();
-      });
-    });
-    gridEl.querySelectorAll('[data-action="subitem-text"]').forEach(el=>{
-      el.addEventListener('input', ()=>{
-        for(const cat of state.categories){
-          const it = cat.items.find(i=>i.id===el.dataset.item);
-          if(it && it.subitems){
-            const sub = it.subitems.find(s=>s.id===el.dataset.sub);
-            if(sub) sub.text = el.textContent;
-          }
-        }
-        clearIfEmpty(el);
       });
     });
 
@@ -3408,56 +3362,6 @@
         if(!draggedItem) return;
         moveItemToCategoryEnd(draggedItem, spacer.dataset.cat);
         draggedItem = null;
-        renderAll();
-      });
-    });
-
-    gridEl.querySelectorAll('.subitem-bullet[draggable="true"]').forEach(handle=>{
-      handle.addEventListener('dragstart', (e)=>{
-        draggedSubitem = { itemId: handle.dataset.item, subId: handle.dataset.sub };
-        e.dataTransfer.effectAllowed = 'move';
-        try{ e.dataTransfer.setData('text/plain', handle.dataset.sub); }catch(err){}
-        const row = handle.closest('.subitem-row');
-        if(row) row.classList.add('dragging');
-      });
-      handle.addEventListener('dragend', ()=>{
-        gridEl.querySelectorAll('.subitem-row').forEach(r=>{
-          r.classList.remove('dragging','drag-over-top','drag-over-bottom');
-        });
-        draggedSubitem = null;
-      });
-    });
-    gridEl.querySelectorAll('.subitem-row').forEach(row=>{
-      row.addEventListener('dragover', (e)=>{
-        if(!draggedSubitem || draggedSubitem.itemId!==row.dataset.item || draggedSubitem.subId===row.dataset.sub) return;
-        e.preventDefault();
-        const rect = row.getBoundingClientRect();
-        const isTop = (e.clientY - rect.top) < rect.height/2;
-        row.classList.toggle('drag-over-top', isTop);
-        row.classList.toggle('drag-over-bottom', !isTop);
-      });
-      row.addEventListener('dragleave', ()=>{
-        row.classList.remove('drag-over-top','drag-over-bottom');
-      });
-      row.addEventListener('drop', (e)=>{
-        e.preventDefault();
-        row.classList.remove('drag-over-top','drag-over-bottom');
-        if(!draggedSubitem || draggedSubitem.itemId!==row.dataset.item || draggedSubitem.subId===row.dataset.sub) return;
-        for(const cat of state.categories){
-          const it = cat.items.find(i=>i.id===row.dataset.item);
-          if(it && it.subitems){
-            const fromIdx = it.subitems.findIndex(s=>s.id===draggedSubitem.subId);
-            if(fromIdx===-1) break;
-            const rect = row.getBoundingClientRect();
-            const isTop = (e.clientY - rect.top) < rect.height/2;
-            const [moved] = it.subitems.splice(fromIdx,1);
-            let toIdx = it.subitems.findIndex(s=>s.id===row.dataset.sub);
-            const insertAt = isTop ? toIdx : toIdx+1;
-            it.subitems.splice(insertAt, 0, moved);
-          }
-          break;
-        }
-        draggedSubitem = null;
         renderAll();
       });
     });
@@ -3561,6 +3465,173 @@
     }
   });
 
+  const subitemPopoverEl = document.getElementById('subitemPopover');
+  let subitemPopoverDragging = false;
+  let subitemPopoverMouseDownInside = false;
+  document.addEventListener('mousedown', (e)=>{
+    subitemPopoverMouseDownInside = subitemPopoverEl.contains(e.target) || !!e.target.closest('.item-expand-btn');
+  });
+
+  function findItemById(id){
+    for(const cat of state.categories){
+      const it = cat.items.find(i=>i.id===id);
+      if(it) return it;
+    }
+    return null;
+  }
+  function findItemAndCat(id){
+    for(const cat of state.categories){
+      const it = cat.items.find(i=>i.id===id);
+      if(it) return {item:it, cat};
+    }
+    return null;
+  }
+
+  function renderSubitemPopoverContent(itemId){
+    const found = findItemAndCat(itemId);
+    if(!found){ closeSubitemPopover(); return; }
+    const it = found.item;
+    const c = COLORS[found.cat.color] || COLORS.default;
+    if(!it.subitems) it.subitems = [];
+    const subs = it.subitems;
+    subitemPopoverEl.innerHTML = `
+      <div class="subitem-popover-title" style="color:${c.text};">${escapeHtml(it.text) || '하위 목록'}</div>
+      ${subs.length===0 ? `<div class="subitem-popover-empty">아직 항목이 없어요</div>` : subs.map(s=>`
+        <div class="subitem-row" data-item="${itemId}" data-sub="${s.id}">
+          <span class="subitem-bullet" draggable="true" data-item="${itemId}" data-sub="${s.id}" title="끌어서 순서 이동" style="color:${c.dot};">·</span>
+          <span class="subitem-text" contenteditable="true" data-action="popover-subitem-text" data-item="${itemId}" data-sub="${s.id}">${escapeHtml(s.text)}</span>
+          <button class="subitem-del" data-action="popover-del-subitem" data-item="${itemId}" data-sub="${s.id}" title="삭제">✕</button>
+        </div>
+      `).join('')}
+      <button type="button" class="subitem-popover-addbtn" data-action="popover-add-subitem" data-item="${itemId}">+ 항목 추가</button>
+    `;
+
+    subitemPopoverEl.querySelectorAll('[data-action="popover-subitem-text"]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        const item = findItemById(el.dataset.item);
+        if(item && item.subitems){
+          const sub = item.subitems.find(s=>s.id===el.dataset.sub);
+          if(sub) sub.text = el.textContent;
+        }
+        clearIfEmpty(el);
+      });
+    });
+    subitemPopoverEl.querySelectorAll('[data-action="popover-del-subitem"]').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const item = findItemById(el.dataset.item);
+        if(item && item.subitems){
+          item.subitems = item.subitems.filter(s=>s.id!==el.dataset.sub);
+        }
+        renderSubitemPopoverContent(el.dataset.item);
+        renderMobile();
+      });
+    });
+    const addBtn = subitemPopoverEl.querySelector('[data-action="popover-add-subitem"]');
+    if(addBtn){
+      addBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const item = findItemById(addBtn.dataset.item);
+        if(item){
+          if(!item.subitems) item.subitems = [];
+          item.subitems.push({id:uid(), text:''});
+        }
+        renderSubitemPopoverContent(addBtn.dataset.item);
+        renderMobile();
+      });
+    }
+    subitemPopoverEl.querySelectorAll('.subitem-bullet[draggable="true"]').forEach(handle=>{
+      handle.addEventListener('dragstart', (e)=>{
+        draggedSubitem = { itemId: handle.dataset.item, subId: handle.dataset.sub };
+        subitemPopoverDragging = true;
+        e.dataTransfer.effectAllowed = 'move';
+        try{ e.dataTransfer.setData('text/plain', handle.dataset.sub); }catch(err){}
+        const row = handle.closest('.subitem-row');
+        if(row) row.classList.add('dragging');
+      });
+      handle.addEventListener('dragend', ()=>{
+        subitemPopoverEl.querySelectorAll('.subitem-row').forEach(r=>{
+          r.classList.remove('dragging','drag-over-top','drag-over-bottom');
+        });
+        draggedSubitem = null;
+        // dragend 직후 브라우저가 바깥 클릭을 한 번 더 흘려보내는 경우가 있어서, 한 틱 늦게 플래그를 내린다
+        setTimeout(()=>{ subitemPopoverDragging = false; }, 50);
+      });
+    });
+    subitemPopoverEl.querySelectorAll('.subitem-row').forEach(row=>{
+      row.addEventListener('dragover', (e)=>{
+        if(!draggedSubitem || draggedSubitem.itemId!==row.dataset.item || draggedSubitem.subId===row.dataset.sub) return;
+        e.preventDefault();
+        const rect = row.getBoundingClientRect();
+        const isTop = (e.clientY - rect.top) < rect.height/2;
+        row.classList.toggle('drag-over-top', isTop);
+        row.classList.toggle('drag-over-bottom', !isTop);
+      });
+      row.addEventListener('dragleave', ()=>{
+        row.classList.remove('drag-over-top','drag-over-bottom');
+      });
+      row.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        row.classList.remove('drag-over-top','drag-over-bottom');
+        if(!draggedSubitem || draggedSubitem.itemId!==row.dataset.item || draggedSubitem.subId===row.dataset.sub) return;
+        const item = findItemById(row.dataset.item);
+        if(item && item.subitems){
+          const fromIdx = item.subitems.findIndex(s=>s.id===draggedSubitem.subId);
+          if(fromIdx!==-1){
+            const rect = row.getBoundingClientRect();
+            const isTop = (e.clientY - rect.top) < rect.height/2;
+            const [moved] = item.subitems.splice(fromIdx,1);
+            let toIdx = item.subitems.findIndex(s=>s.id===row.dataset.sub);
+            const insertAt = isTop ? toIdx : toIdx+1;
+            item.subitems.splice(insertAt, 0, moved);
+          }
+        }
+        draggedSubitem = null;
+        renderSubitemPopoverContent(row.dataset.item);
+      });
+    });
+  }
+
+  function openSubitemPopover(btn, itemId){
+    openSubitemItemId = itemId;
+    renderSubitemPopoverContent(itemId);
+
+    const rowEl = btn.closest('.item-row-name');
+    const anchorRect = (rowEl || btn).getBoundingClientRect();
+    subitemPopoverEl.style.left = anchorRect.left + 'px';
+    subitemPopoverEl.style.width = anchorRect.width + 'px';
+    subitemPopoverEl.style.display = 'block';
+    subitemPopoverEl.style.top = (anchorRect.bottom + 4) + 'px';
+    subitemPopoverEl.style.bottom = '';
+
+    // 화면 아래로 넘치면 버튼 위쪽으로 뒤집어서 연다
+    requestAnimationFrame(()=>{
+      const popRect = subitemPopoverEl.getBoundingClientRect();
+      if(popRect.bottom > window.innerHeight - 8){
+        subitemPopoverEl.style.top = '';
+        subitemPopoverEl.style.bottom = (window.innerHeight - anchorRect.top + 4) + 'px';
+      }
+    });
+
+    document.querySelectorAll('.item-expand-btn').forEach(b=> b.classList.remove('open'));
+    btn.classList.add('open');
+  }
+
+  function closeSubitemPopover(){
+    openSubitemItemId = null;
+    subitemPopoverEl.style.display = 'none';
+    document.querySelectorAll('.item-expand-btn').forEach(b=> b.classList.remove('open'));
+  }
+
+  document.addEventListener('click', (e)=>{
+    if(subitemPopoverDragging) return;
+    if(subitemPopoverMouseDownInside) return; // 클릭이 팝오버 안에서 시작된 상호작용(텍스트 선택 등)이면 무시
+    if(subitemPopoverEl.style.display==='block' && !subitemPopoverEl.contains(e.target) && !e.target.closest('.item-expand-btn')){
+      closeSubitemPopover();
+    }
+  });
+  window.addEventListener('resize', ()=>{ closeSubitemPopover(); });
+
   let memoUndoStack = [];
   let memoCheckpointTimer = null;
   let memoLastCommitted = '';
@@ -3591,7 +3662,8 @@
     plannerCheckpointTimer = null;
     plannerLastCommitted = prevJSON;
     expandedItemIds.clear();
-    allSubitemsOpen = false;
+    openSubitemItemId = null;
+    closeSubitemPopover();
     renderAll();
     setStatus('실행 취소됨');
   }
@@ -4081,8 +4153,6 @@ function renderUpcomingEvents(){
   }
 
   function renderMobileCatSettings(){
-    const mExpandAllBtnEl = document.getElementById('mExpandAllBtn');
-    if(mExpandAllBtnEl) mExpandAllBtnEl.classList.toggle('all-open', allSubitemsOpen);
     let html = '';
     if(state.categories.length===0){
       html = `<div class="m-empty-note" style="padding:14px;">아직 카테고리가 없어요 · 위 + 버튼으로 추가해보세요</div>`;
@@ -4337,7 +4407,6 @@ function renderUpcomingEvents(){
     renderAll();
   });
   document.getElementById('mCatSettings').querySelector('[data-action="m-copy-prev-cat"]').addEventListener('click', copyPrevWeekCategories);
-  document.getElementById('mExpandAllBtn').addEventListener('click', toggleAllSubitems);
 
   function renderMobileCategoriesForDay(dayIdx){
     if(state.categories.length===0){
@@ -7326,25 +7395,72 @@ function submitFood(){
   saveDay(); renderFoods(); updateTarget();
   ['foodName','carb','protein','fat','sodium','cal'].forEach(id=>document.getElementById(id).value='');
 }
-let foodInlineEditIdx = null;
-function editFood(i){ foodInlineEditIdx = i; renderFoods(); }
-function cancelFoodInlineEdit(){ foodInlineEditIdx = null; renderFoods(); }
-function saveFoodInlineEdit(i){
-  const name = document.getElementById('finName-'+i).textContent.trim();
-  const meal = document.getElementById('finMeal-'+i).value;
-  const carb = parseFloat(document.getElementById('finCarb-'+i).textContent)||0;
-  const protein = parseFloat(document.getElementById('finProtein-'+i).textContent)||0;
-  const fat = parseFloat(document.getElementById('finFat-'+i).textContent)||0;
-  let cal = parseFloat(document.getElementById('finCal-'+i).textContent);
-  if(!name){ alert('음식 이름을 입력해주세요'); return; }
-  if(isNaN(cal)){
-    if(carb||protein||fat) cal = Math.round(carb*4+protein*4+fat*9);
-    else { alert('칼로리 또는 탄단지 중 하나는 입력해주세요'); return; }
-  }
-  dayData.foods[i] = {...dayData.foods[i], name, meal, carb, protein, fat, cal};
-  saveDay(); foodInlineEditIdx = null; renderFoods(); updateTarget();
+const MEAL_BADGE_COLORS = {
+  '아침': {bg:'#E3EBF7', fg:'#3568B0'},
+  '점심': {bg:'#FBEAD9', fg:'#C9932C'},
+  '저녁': {bg:'#F7E3DE', fg:'#B4472C'},
+  '간식': {bg:'#E7EFE2', fg:'#3A5A43'}
+};
+function mealBadgeHtml(meal, idx){
+  const c = MEAL_BADGE_COLORS[meal] || {bg:'#eee', fg:'#666'};
+  return `<span class="diet-meal-badge" data-idx="${idx}" style="background:${c.bg}; color:${c.fg};" title="탭하면 식사 종류가 바뀌고, 다른 곳을 누르면 그 칸으로 옮겨가요">${meal}</span>`;
 }
-function removeFood(i){ dayData.foods.splice(i,1); saveDay(); renderFoods(); updateTarget(); if(foodInlineEditIdx===i) cancelFoodInlineEdit(); }
+// 배지를 눌러서 순환시키는 동안엔 실제로 데이터를 옮기지 않고, 배지 표시만 바꾼다.
+// 다른 곳을 클릭해야(바깥 클릭) 그때 실제로 이동/저장된다.
+let pendingMealIdx = null;
+let pendingMealValue = null;
+function commitPendingMeal(){
+  if(pendingMealIdx === null) return;
+  clearTimeout(pendingMealIdleTimer);
+  if(dayData.foods[pendingMealIdx]){
+    dayData.foods[pendingMealIdx].meal = pendingMealValue;
+    saveDay();
+  }
+  pendingMealIdx = null;
+  pendingMealValue = null;
+  renderFoods();
+  updateTarget();
+}
+let pendingMealIdleTimer = null;
+function handleMealBadgeClick(el, i){
+  if(pendingMealIdx !== null && pendingMealIdx !== i){
+    // 다른 칸이 이미 대기중이면, 먼저 그걸 확정하고 이번 클릭은 여기서 끝낸다(다시 누르면 이 배지가 순환 시작함)
+    commitPendingMeal();
+    return;
+  }
+  if(pendingMealIdx === null){
+    pendingMealIdx = i;
+    pendingMealValue = dayData.foods[i].meal;
+  }
+  const curIdx = MEALS.indexOf(pendingMealValue);
+  pendingMealValue = MEALS[(curIdx+1) % MEALS.length];
+  const c = MEAL_BADGE_COLORS[pendingMealValue] || {bg:'#eee', fg:'#666'};
+  el.textContent = pendingMealValue;
+  el.style.background = c.bg;
+  el.style.color = c.fg;
+  // 3초간 더 조작이 없으면 안전장치로 자동 확정 (탭 이동 등으로 방치되는 경우 대비)
+  clearTimeout(pendingMealIdleTimer);
+  pendingMealIdleTimer = setTimeout(commitPendingMeal, 3000);
+}
+document.addEventListener('click', ()=>{ commitPendingMeal(); });
+window.addEventListener('scroll', ()=>{ commitPendingMeal(); }, true);
+
+function commitFoodField(i){
+  const row = document.querySelector(`[data-food-row="${i}"]`);
+  if(!row) return;
+  const name = row.querySelector('[data-field="name"]').textContent.trim();
+  const carb = parseFloat(row.querySelector('[data-field="carb"]').textContent)||0;
+  const protein = parseFloat(row.querySelector('[data-field="protein"]').textContent)||0;
+  const fat = parseFloat(row.querySelector('[data-field="fat"]').textContent)||0;
+  let cal = parseFloat(row.querySelector('[data-field="cal"]').textContent);
+  if(!name) return; // 이름을 다 지운 상태로 벗어나면 저장하지 않고 원래 값 유지(다음 렌더에서 복원)
+  if(isNaN(cal)){
+    cal = (carb||protein||fat) ? Math.round(carb*4+protein*4+fat*9) : (dayData.foods[i] ? dayData.foods[i].cal : 0);
+  }
+  dayData.foods[i] = {...dayData.foods[i], name, carb, protein, fat, cal};
+  saveDay(); renderFoods(); updateTarget();
+}
+function removeFood(i){ dayData.foods.splice(i,1); saveDay(); renderFoods(); updateTarget(); }
 
 function renderFoods(){
   const container = document.getElementById('mealSections');
@@ -7357,42 +7473,38 @@ function renderFoods(){
       <table><colgroup><col class="col-name"><col class="col-num"><col class="col-num"><col class="col-num"><col class="col-cal"><col class="col-act" style="width:14%;"></colgroup>
       <thead><tr><th class="col-name">음식</th><th class="col-num">탄</th><th class="col-num">단</th><th class="col-num">지</th><th class="col-cal">kcal</th><th class="col-act"></th></tr></thead><tbody>`;
     items.forEach(f=>{
-      if(foodInlineEditIdx===f.idx){
-        const mealOpts = MEALS.map(m=>`<option value="${m}" ${m===f.meal?'selected':''}>${m}</option>`).join('');
-        html += `<tr>
-          <td class="col-name"><span class="etext" id="finName-${f.idx}" contenteditable="true">${f.name}</span></td>
-          <td class="col-num"><span class="etext" id="finCarb-${f.idx}" contenteditable="true">${f.carb||''}</span></td>
-          <td class="col-num"><span class="etext" id="finProtein-${f.idx}" contenteditable="true">${f.protein||''}</span></td>
-          <td class="col-num"><span class="etext" id="finFat-${f.idx}" contenteditable="true">${f.fat||''}</span></td>
-          <td class="col-cal"><span class="etext" id="finCal-${f.idx}" contenteditable="true">${f.cal}</span></td>
-          <td class="col-act">
-            <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
-              <select class="etext-meal" id="finMeal-${f.idx}">${mealOpts}</select>
-              <button class="icon-btn edit" onclick="saveFoodInlineEdit(${f.idx})" title="저장">✓</button>
-              <button class="icon-btn del" onclick="cancelFoodInlineEdit()" title="취소">✕</button>
-            </div>
-          </td>
-        </tr>`;
-      } else {
-        html += `<tr>
-          <td class="col-name">${f.name}</td>
-          <td class="col-num">${f.carb?fmt(f.carb):'-'}</td>
-          <td class="col-num">${f.protein?fmt(f.protein):'-'}</td>
-          <td class="col-num">${f.fat?fmt(f.fat):'-'}</td>
-          <td class="col-cal">${fmt(f.cal)}</td>
+      html += `<tr data-food-row="${f.idx}">
+          <td class="col-name"><div style="display:flex; align-items:center; gap:6px;">${mealBadgeHtml(f.meal, f.idx)}<span class="etext" data-field="name" contenteditable="true" style="flex:1; min-width:0;">${f.name}</span></div></td>
+          <td class="col-num"><span class="etext" data-field="carb" contenteditable="true">${f.carb||''}</span></td>
+          <td class="col-num"><span class="etext" data-field="protein" contenteditable="true">${f.protein||''}</span></td>
+          <td class="col-num"><span class="etext" data-field="fat" contenteditable="true">${f.fat||''}</span></td>
+          <td class="col-cal"><span class="etext" data-field="cal" contenteditable="true">${f.cal}</span></td>
           <td class="col-act">
             <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
               <button class="icon-btn fav" onclick="saveFoodItemAsFav(${f.idx})" title="즐겨찾기에 저장">⭐</button>
-              <button class="icon-btn edit" onclick="editFood(${f.idx})" title="수정">✎</button>
               <button class="icon-btn del" onclick="removeFood(${f.idx})" title="삭제">✕</button>
             </div>
           </td>
         </tr>`;
-      }
     });
     html += `</tbody></table></div>`;
   });
   container.innerHTML = html;
+  container.querySelectorAll('[data-field]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      const row = el.closest('[data-food-row]');
+      if(row) commitFoodField(+row.dataset.foodRow);
+    });
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
+    });
+  });
+  container.querySelectorAll('.diet-meal-badge').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      handleMealBadgeClick(el, +el.dataset.idx);
+    });
+  });
   document.getElementById('foodEmpty').style.display = dayData.foods.length ? 'none' : 'block';
 
   const sumCal = dayData.foods.reduce((a,f)=>a+f.cal,0);
@@ -7562,16 +7674,16 @@ function renderFridge(){
       .sort((a,b)=>{ if(!a.expire) return 1; if(!b.expire) return -1; return fromISO(a.expire)-fromISO(b.expire); });
     if(items.length===0) return;
     html += `<div class="meal-section"><div class="meal-title"><span>${slot}</span><span class="sub-total">${items.length}개</span></div>
-      <table><colgroup><col style="width:22%"><col style="width:16%"><col style="width:24%"><col style="width:12%"><col style="width:26%"></colgroup>
-      <thead><tr><th>재료</th><th>소비기한</th><th>용도</th><th>상태</th><th></th></tr></thead><tbody>`;
+      <table><colgroup><col style="width:30%"><col style="width:14%"><col style="width:10%"><col style="width:18%"><col style="width:28%"></colgroup>
+      <thead><tr><th>재료</th><th>소비기한</th><th>상태</th><th>용도</th><th></th></tr></thead><tbody>`;
     items.forEach(it=>{
       if(inlineEditIdx===it.idx){
         const slotOpts = SLOT_OPTIONS[it.zone].map(s=>`<option value="${s}" ${s===it.slot?'selected':''}>${s}</option>`).join('');
         html += `<tr>
           <td><span class="etext" id="finItemName-${it.idx}" contenteditable="true">${it.name}</span></td>
           <td><input type="date" class="etext-date" id="finItemExpire-${it.idx}" value="${it.expire||''}"></td>
-          <td><span class="etext" id="finItemPurpose-${it.idx}" contenteditable="true">${it.purpose||''}</span></td>
           <td>-</td>
+          <td><span class="etext" id="finItemPurpose-${it.idx}" contenteditable="true">${it.purpose||''}</span></td>
           <td style="white-space:nowrap;">
             <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
               <select class="etext-meal" id="finItemSlot-${it.idx}">${slotOpts}</select>
@@ -7584,8 +7696,8 @@ function renderFridge(){
         html += `<tr>
           <td>${it.name}</td>
           <td>${shortDate(it.expire)}</td>
-          <td>${it.purpose||'-'}</td>
           <td>${statusBadge(it.expire)}</td>
+          <td>${it.purpose||'-'}</td>
           <td style="white-space:nowrap;">
             <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
               <button class="icon-btn edit" onclick="editItem(${it.idx})" title="수정">✎</button>
@@ -7679,9 +7791,12 @@ async function renderCalendarMonth(){
     const isSelected = dISO===currentDate;
     const info = dataMap[dISO];
     html += `<div class="cal-cell ${isSun?'sun':''} ${hol?'holiday':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-iso="${dISO}" onclick="calPickDate('${dISO}')">
-      <span class="cal-daynum">${day}</span>
+      <span class="cal-daynum-row">
+        <span class="cal-daynum">${day}</span>
+        ${info && info.weightDiff!==undefined && info.weightDiff!==0 ? `<span class="cal-weight-diff ${info.weightDiff>0?'gain':'loss'}">${info.weightDiff>0?'+':''}${info.weightDiff.toFixed(1)}</span>` : ''}
+      </span>
       ${hol?`<span class="cal-hol">${hol}</span>`:''}
-      ${info && info.weight?`<span class="cal-weight">${info.weight}kg${info.weightDiff!==undefined ? `<span class="cal-weight-diff" style="color:${info.weightDiff>0?'var(--blue)':(info.weightDiff<0?'var(--clay)':'var(--sub)')};">(${info.weightDiff>0?'+':''}${info.weightDiff.toFixed(1)})</span>` : ''}</span>`:''}
+      ${info && info.weight?`<span class="cal-weight">${info.weight}kg</span>`:''}
       ${info && info.kcal?`<span class="cal-kcal">${Math.round(info.kcal)}kcal</span>`:''}
       ${info && info.ratio?`<span class="cal-ratio">${info.ratio}</span>`:''}
     </div>`;
@@ -7752,9 +7867,6 @@ window.editExercise = editExercise;
 window.cancelExEdit = cancelExEdit;
 window.removeExercise = removeExercise;
 window.submitFood = submitFood;
-window.editFood = editFood;
-window.cancelFoodInlineEdit = cancelFoodInlineEdit;
-window.saveFoodInlineEdit = saveFoodInlineEdit;
 window.removeFood = removeFood;
 window.saveFav = saveFav;
 window.saveFoodItemAsFav = saveFoodItemAsFav;
