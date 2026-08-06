@@ -936,10 +936,10 @@
     color: var(--ink);
   }
 #app-routine .wrap { max-width: 1000px; margin: 0 auto; }
-#app-routine .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
-#app-routine h1 { font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
+#app-routine .header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 2px; flex-wrap: nowrap; }
+#app-routine h1 { font-size: 29px; font-weight: 700; margin: 0; letter-spacing: -0.3px; white-space: nowrap; flex-shrink: 0; }
 #app-routine .sub { font-size: 13px; color: var(--sub); margin: 0 0 14px; }
-#app-routine .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+#app-routine .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; flex-shrink: 0; }
 #app-routine button {
     padding: 6px 12px;
     border: 1px solid var(--line);
@@ -1116,7 +1116,13 @@
     max-width: 100%;
     box-sizing: border-box;
     box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    overflow-x: hidden;
   }
+@media (max-width: 400px) {
+  #app-routine .overlay { padding: 8px; }
+  #app-routine .modal { padding: 16px 14px; }
+  #app-routine .modal .time-row .field { flex-basis: 100%; }
+}
 #app-routine .modal h2 { font-size: 15px; font-weight: 600; margin: 0 0 14px; }
 #app-routine .modal .field { margin-bottom: 12px; min-width: 0; }
 #app-routine .modal label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 4px; }
@@ -1208,7 +1214,7 @@
     cursor: pointer;
   }
 #app-routine .day-group-nav button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-@media (max-width: 720px) {#app-routine { padding: 14px; }#app-routine table#routine-table { min-width: 0; }#app-routine .time-col { width: 96px; }#app-routine td.time { font-size: 12px; }}
+@media (max-width: 720px) {#app-routine { padding: 14px; }#app-routine table#routine-table { min-width: 0; }#app-routine .time-col { width: 96px; }#app-routine td.time { font-size: 12px; }#app-routine h1 { font-size: 21px; }}
 #app-routine .modal input[type="text"] {
     width: 100%;
     border: 1px solid var(--line);
@@ -1968,15 +1974,13 @@
 
 <div class="wrap">
   <div class="header-row">
-    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <h1>Weekly Routine</h1>
-      <div class="routine-tabs" id="routine-tabs"></div>
-    </div>
+    <h1>Weekly Routine</h1>
     <div class="toolbar">
       <button id="undo-btn" class="icon-btn" title="실행 취소" disabled>↩</button>
       <button id="save-btn" class="primary">저장</button>
     </div>
   </div>
+  <div class="routine-tabs" id="routine-tabs" style="margin-bottom:10px;"></div>
   <div class="status" id="status"></div>
   <div class="day-group-nav" id="day-group-nav"></div>
 
