@@ -445,6 +445,7 @@
   }
 #app-planner .cal-navbtn:hover { color:var(--navy); }
 #app-planner .header-navbtn { font-size:20px; width:24px; height:24px; }
+#app-planner #mPrevWeek, #app-planner #mNextWeek { font-size:32px; width:38px; height:38px; }
 #app-planner .cal-grid {display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:26px; gap:2px; text-align:center;}
 #app-planner .cal-dow {font-size:11px; color:var(--muted); font-weight:700; padding-bottom:4px;}
 #app-planner .cal-dow.sun {color:var(--red);}
@@ -501,17 +502,21 @@
     text-align:center; color:var(--muted); font-size:11.5px; margin-top:18px;
   }
 #app-planner .m-header {
-    display:flex; flex-direction:column; gap:8px; margin-bottom:10px;
+    display:flex; flex-direction:column; gap:4px; margin-bottom:10px;
+  }
+#app-planner .m-title-row {
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;
   }
 #app-planner .m-title {
-    font-size:24px; font-weight:800; color:var(--navy); outline:none;
+    font-size:clamp(15px,5.5vw,24px); font-weight:800; color:var(--navy); outline:none;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1 1 auto;
   }
 #app-planner .m-title:focus {background:var(--grid-soft); border-radius:6px;}
 #app-planner .m-subrow {
     display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
   }
 #app-planner .m-navgroup { display:flex; align-items:center; gap:6px; }
-#app-planner .m-savegroup { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+#app-planner .m-savegroup { display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
 #app-planner .m-daycard {
     border:1px solid var(--grid); border-radius:10px; background:var(--card);
     margin-bottom:10px; overflow:hidden;
@@ -524,35 +529,48 @@
     background:var(--navy); color:#fff; font-weight:800; font-size:13px;
     padding:10px 12px; display:flex; align-items:center; justify-content:space-between;
   }
-#app-planner .m-bigcal-card {
+#app-planner .m-cal-upcoming-card {
     border:1px solid var(--grid); border-radius:10px; background:var(--card);
-    padding:14px; margin-bottom:14px;
+    padding:12px; margin-bottom:14px;
   }
-#app-planner .m-upcoming-card {
-    border:1px solid var(--grid); border-radius:10px; background:var(--card);
-    padding:14px; margin-bottom:14px;
-  }
-#app-planner .m-upcoming-title-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-#app-planner .m-upcoming-title { font-weight:800; color:var(--navy); font-size:14px; }
-#app-planner .m-upcoming-list { display:flex; flex-direction:column; }
+#app-planner .m-cal-upcoming-row { display:flex; align-items:stretch; gap:10px; }
+#app-planner .m-bigcal-col { flex:1 1 0; min-width:0; }
+#app-planner .m-cal-divider { width:1px; background:var(--grid); flex-shrink:0; }
+#app-planner .m-upcoming-col { flex:1 1 0; min-width:0; display:flex; flex-direction:column; }
+#app-planner .m-upcoming-title-row { margin-bottom:6px; }
+#app-planner .m-upcoming-title { font-weight:800; color:var(--navy); font-size:12.5px; }
+#app-planner .m-upcoming-list { display:flex; flex-direction:column; overflow-y:auto; max-height:220px; }
 #app-planner .m-upcoming-item {
-    display:flex; align-items:stretch; gap:10px; padding:10px 2px;
+    display:flex; align-items:stretch; gap:6px; padding:6px 2px;
     border-bottom:1px solid var(--grid-soft); cursor:pointer;
   }
+#app-planner .m-upcoming-actions { display:flex; align-items:center; gap:2px; flex-shrink:0; }
+#app-planner .m-upcoming-actions .u-editbtn, #app-planner .m-upcoming-actions .u-delbtn {
+    font-size:11px; padding:2px 3px;
+  }
 #app-planner .m-upcoming-item:last-child { border-bottom:none; }
-#app-planner .m-upcoming-bar { width:4px; border-radius:3px; flex-shrink:0; }
+#app-planner .m-upcoming-bar { width:3px; border-radius:2px; flex-shrink:0; }
 #app-planner .m-upcoming-body { flex:1; min-width:0; }
-#app-planner .m-upcoming-item-title { font-weight:700; font-size:14.5px; color:#1a1f2e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-#app-planner .m-upcoming-item-date { font-size:12px; color:var(--muted); margin-top:2px; }
-#app-planner .m-upcoming-empty { font-size:12.5px; color:var(--muted); padding:6px 2px; }
+#app-planner .m-upcoming-item-title { font-weight:700; font-size:11.5px; color:#1a1f2e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#app-planner .m-upcoming-item-date { font-size:9.5px; color:var(--muted); margin-top:1px; }
+#app-planner .m-upcoming-item-dday { font-size:9.5px; color:var(--muted); font-weight:700; margin-top:1px; }
+#app-planner .m-upcoming-empty { font-size:11px; color:var(--muted); padding:4px 2px; }
 #app-planner .m-bigcal-head {
-    display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;
   }
 #app-planner .m-bigcal-head span { font-weight:800; color:var(--navy); font-size:15px; }
 #app-planner .m-bigcal-dow { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; margin-bottom:4px; }
 #app-planner .m-bigcal-dow span { font-size:11px; color:var(--muted); font-weight:700; }
 #app-planner .m-bigcal-dow span.sun { color:var(--red); }
 #app-planner .m-bigcal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+#app-planner .m-bigcal-col .m-bigcal-head span { font-size:12.5px; }
+#app-planner .m-cal-month-nav {
+    border:none; background:none; color:#c3c8d4; font-size:20px; line-height:1;
+    width:20px; height:20px; padding:0; display:flex; align-items:center; justify-content:center;
+  }
+#app-planner .m-cal-month-nav:hover { color:var(--navy); }
+#app-planner .m-bigcal-col .m-bigcal-cell { font-size:10.5px; }
+#app-planner .m-bigcal-col .m-bigcal-dow span { font-size:9px; }
 #app-planner .m-bigcal-cell {
     aspect-ratio:1; display:flex; align-items:center; justify-content:center;
     font-size:13px; color:#2a3142; border-radius:8px; cursor:pointer; position:relative;
@@ -561,8 +579,9 @@
 #app-planner .m-bigcal-cell.sun { color:var(--red); }
 #app-planner .m-bigcal-cell.in-week { background:var(--highlight); }
 #app-planner .m-bigcal-cell.today { box-shadow:inset 0 0 0 1.5px var(--navy); font-weight:800; }
-#app-planner .m-bigcal-cell.selected { background:var(--navy); color:#fff; font-weight:800; }
-#app-planner .m-bigcal-cell.selected.sun { color:#fff; }
+#app-planner .m-bigcal-cell.selected { box-shadow:inset 0 0 0 1.5px var(--navy); background:var(--highlight); color:inherit; font-weight:800; }
+#app-planner .m-bigcal-cell.selected.today { box-shadow:inset 0 0 0 2px var(--navy); }
+#app-planner .m-bigcal-cell.selected.sun { color:var(--red); }
 #app-planner .m-daycard.today { border-color:var(--navy); border-width:1.5px; }
 #app-planner .m-daycard-head {
     display:flex; align-items:center; justify-content:space-between;
@@ -734,18 +753,24 @@
   }
 #app-monthly .mp-wrap { max-width:960px; margin:0 auto; }
 #app-monthly .mp-header {
-    display:flex; align-items:center; gap:10px; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:nowrap;
   }
-#app-monthly .mp-title { font-size:24px; font-weight:800; color:var(--navy); letter-spacing:-0.5px; }
+#app-monthly .mp-title { font-size:clamp(15px,5vw,24px); font-weight:800; color:var(--navy); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+#app-monthly .mp-navbtn.m-reset-boxed {
+    border:1px solid var(--grid); background:#fff; color:var(--navy);
+    width:28px; height:28px; border-radius:8px; margin-left:2px;
+  }
+#app-monthly .mp-navbtn.m-reset-boxed:hover { background:var(--grid-soft); color:var(--navy); }
 #app-monthly .mp-navbtn {
     border:none; background:none; color:#c3c8d4; cursor:pointer;
-    width:24px; height:24px; font-size:20px; line-height:1; padding:0;
+    width:24px; height:24px; font-size:20px; line-height:1; padding:0; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
   }
 #app-monthly .mp-navbtn:hover { color:var(--navy); }
 #app-monthly .mp-today-btn {
     border:1px solid var(--grid); background:#fff; color:var(--muted);
     font-size:12px; font-weight:700; padding:6px 14px; border-radius:20px; cursor:pointer;
+    flex-shrink:0; white-space:nowrap;
   }
 #app-monthly .mp-today-btn:hover { background:var(--grid-soft); color:var(--navy); border-color:var(--navy); }
 #app-monthly .mp-save-status { margin-left:auto; font-size:11.5px; color:var(--muted); }
@@ -1254,11 +1279,11 @@
   }
 #app-money .hero-title-block { min-width:0; flex:1 1 auto; }
 #app-money .eyebrow {
-    font-size:11px;letter-spacing:.14em;color:var(--gold-deep);
-    font-weight:700;text-transform:uppercase;
+    font-size:10px;letter-spacing:.1em;color:var(--gold-deep);
+    font-weight:700;text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
 #app-money h1 {
-    font-size:18px;margin:0;font-weight:800;letter-spacing:-0.02em;
+    font-size:clamp(14px,4.5vw,18px);margin:0;font-weight:800;letter-spacing:-0.02em;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
 #app-money .hero-action-row { display:flex; align-items:center; gap:6px; flex-shrink:0; }
@@ -1271,6 +1296,11 @@
 #app-money .hero-icon-btn:hover { background:#fff; }
 #app-money .hero-icon-btn.icon-only { width:30px; padding:0; }
 #app-money .hero-icon-btn.icon-only svg { width:16px; height:16px; }
+@media (max-width:400px){
+  #app-money .hero-icon-btn { height:26px; font-size:11px; padding:0 7px; }
+  #app-money .hero-icon-btn.icon-only { width:26px; }
+  #app-money .hero-icon-btn.icon-only svg { width:14px; height:14px; }
+}
 #app-money .sub {display:none;}
 #app-money .control-row {
     display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-start;
@@ -1668,7 +1698,7 @@
         <button class="cal-navbtn header-navbtn" id="prevWeek" title="이전 주">‹</button>
         <span class="subrange" id="subRange"></span>
         <button class="cal-navbtn header-navbtn" id="nextWeek" title="다음 주">›</button>
-        <button class="navbtn" id="resetGearBtn" title="데이터 초기화" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+        <button class="navbtn" id="resetGearBtn" title="데이터 초기화" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
         <div class="save-group">
           <button class="save-btn" id="saveBtn">저장</button>
           <span class="save-status" id="saveStatus"></span>
@@ -1721,20 +1751,20 @@
   <!-- ============ MOBILE VIEW (day accordion) ============ -->
   <div class="mobile-only" id="mobileRoot">
     <div class="m-header">
-      <div class="m-title" id="mTitleText" contenteditable="true" spellcheck="false"></div>
-      <div class="m-subrow">
-        <div class="m-navgroup">
-          <button class="cal-navbtn header-navbtn" id="mPrevWeek" title="이전 주">‹</button>
-          <span class="subrange" id="mSubRange"></span>
-          <button class="cal-navbtn header-navbtn" id="mNextWeek" title="다음 주">›</button>
-        </div>
+      <div class="m-title-row">
+        <div class="m-title" id="mTitleText" contenteditable="true" spellcheck="false"></div>
         <div class="m-savegroup">
           <div style="display:flex; align-items:center; gap:6px;">
-            <button class="navbtn" id="mResetGearBtn" title="데이터 초기화" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+            <button class="navbtn" id="mResetGearBtn" title="데이터 초기화" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
             <button class="save-btn" id="mSaveBtn">저장</button>
           </div>
           <span class="save-status" id="mSaveStatus"></span>
         </div>
+      </div>
+      <div class="m-navgroup">
+        <button class="cal-navbtn header-navbtn" id="mPrevWeek" title="이전 주">‹</button>
+        <span class="subrange" id="mSubRange"></span>
+        <button class="cal-navbtn header-navbtn" id="mNextWeek" title="다음 주">›</button>
       </div>
     </div>
 
@@ -1749,21 +1779,32 @@
       <div id="mCatSettingsBody"></div>
     </div>
 
-    <div class="m-bigcal-card">
-      <div class="m-bigcal-head">
-        <button class="navbtn" id="mCalPrevMonth" title="이전 달">◀</button>
-        <span id="mBigCalTitle"></span>
-        <button class="navbtn" id="mCalNextMonth" title="다음 달">▶</button>
+    <div class="m-cal-upcoming-card">
+      <div class="m-cal-upcoming-row">
+        <div class="m-bigcal-col">
+          <div class="m-bigcal-head">
+            <button class="navbtn m-cal-month-nav" id="mCalPrevMonth" title="이전 달">‹</button>
+            <span id="mBigCalTitle"></span>
+            <button class="navbtn m-cal-month-nav" id="mCalNextMonth" title="다음 달">›</button>
+          </div>
+          <div class="m-bigcal-dow" id="mBigCalDow"></div>
+          <div class="m-bigcal-grid" id="mBigCalGrid"></div>
+        </div>
+        <div class="m-cal-divider"></div>
+        <div class="m-upcoming-col">
+          <div class="m-upcoming-title-row" style="display:flex; align-items:center; justify-content:space-between;">
+            <span class="m-upcoming-title">다가오는 일정</span>
+            <div style="display:flex; align-items:center; gap:4px; position:relative;">
+              <button class="cal-today-btn" id="mCalAddEventBtn" title="일정 추가" style="width:18px; height:18px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:11px; line-height:1;">+</button>
+              <button class="cal-today-btn" id="mCalPastToggleBtn" title="지난 일정 보기" style="width:18px; height:18px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:10px; line-height:1;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+              </button>
+              <div class="cal-past-popover" id="mCalPastList" style="display:none;"></div>
+            </div>
+          </div>
+          <div class="m-upcoming-list" id="mUpcomingList"></div>
+        </div>
       </div>
-      <div class="m-bigcal-dow" id="mBigCalDow"></div>
-      <div class="m-bigcal-grid" id="mBigCalGrid"></div>
-    </div>
-
-    <div class="m-upcoming-card">
-      <div class="m-upcoming-title-row">
-        <span class="m-upcoming-title">다가오는 일정</span>
-      </div>
-      <div class="m-upcoming-list" id="mUpcomingList"></div>
     </div>
 
     <div class="m-daycard open" id="mDailyCard">
@@ -1868,7 +1909,7 @@
     <div class="mp-title" id="mpTitle"></div>
     <button class="mp-navbtn" id="mpNextMonth" title="다음 달">›</button>
     <span class="mp-save-status" id="mpSaveStatus"></span>
-    <button class="mp-navbtn" id="mpResetGearBtn" title="데이터 초기화" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+    <button class="mp-navbtn m-reset-boxed" id="mpResetGearBtn" title="데이터 초기화" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
     <button class="mp-today-btn" id="mpTodayBtn" title="이번 달로 이동">오늘</button>
   </div>
 
@@ -1976,7 +2017,7 @@
   <div class="header-row">
     <h1>Weekly Routine</h1>
     <div class="toolbar">
-      <button id="undo-btn" class="icon-btn" title="실행 취소" disabled>↩</button>
+      <button id="undo-btn" class="icon-btn" title="실행 취소" disabled style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-1"/></svg></button>
       <button id="save-btn" class="primary">저장</button>
     </div>
   </div>
@@ -2024,7 +2065,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
         </button>
         <button class="hero-icon-btn icon-only" id="moneyResetBtn" title="초기화">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg>
         </button>
       </div>
     </div>
@@ -2295,7 +2336,7 @@
       </div>
       <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-bottom:10px;">
         <button class="cal-today-btn" onclick="calGoToday()">이번 달로</button>
-        <button class="cal-today-btn" onclick="openDietResetModal()" title="기간 초기화" style="width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+        <button class="cal-today-btn" onclick="openDietResetModal()" title="기간 초기화" style="width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
       </div>
       <div class="cal-dow-row" id="calDowRow"></div>
       <div class="cal-grid" id="dietCalGrid"></div>
@@ -2314,9 +2355,9 @@
 <div class="modal-overlay" id="dietResetModal" onclick="if(event.target===this) closeDietResetModal()">
   <div class="modal-box" style="max-width:340px;">
     <h3>기간 초기화 <button class="modal-close" onclick="closeDietResetModal()">✕</button></h3>
-    <div class="row">
-      <div><label>시작일</label><input type="date" id="dietResetStart"></div>
-      <div><label>종료일</label><input type="date" id="dietResetEnd"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:2px;">
+      <div style="min-width:0;"><label>시작일</label><input type="date" id="dietResetStart" style="width:100%; box-sizing:border-box;"></div>
+      <div style="min-width:0;"><label>종료일</label><input type="date" id="dietResetEnd" style="width:100%; box-sizing:border-box;"></div>
     </div>
     <div style="font-size:11.5px; color:var(--sub); margin:4px 0 12px;">이 기간의 식단·운동·체중 기록이 삭제돼요. (냉장고, 즐겨찾기는 유지)</div>
     <div style="display:flex; gap:8px; justify-content:flex-end;">
@@ -2847,9 +2888,7 @@
   }
   function mobileEventChipsHtml(dISO){
     const dayEvents = sortDayEvents(eventsForDate(dISO));
-    const hol = holidayName(dISO);
     const parts = [];
-    if(hol) parts.push(`<span class="daynote-holiday" title="공휴일">${escapeHtml(hol)}</span>`);
     dayEvents.forEach(ev=>{
       parts.push(`<div class="m-eventlabel-chip" data-action="edit-event" data-id="${ev.id}" title="탭하여 수정">
         <div class="m-eventlabel-chip-title" style="color:${ev.color || 'var(--navy)'};">${escapeHtml(eventLabelText(ev, dISO))}</div>
@@ -4027,6 +4066,8 @@ function renderUpcomingEvents(){
   let pastEventsOpen = false;
   const calPastToggleBtnEl = document.getElementById('calPastToggleBtn');
   const calPastListEl = document.getElementById('calPastList');
+  const mCalPastToggleBtnEl = document.getElementById('mCalPastToggleBtn');
+  const mCalPastListEl = document.getElementById('mCalPastList');
 
   function renderPastEvents(){
     const todayISO = toISO(new Date());
@@ -4036,43 +4077,47 @@ function renderUpcomingEvents(){
 
     calPastToggleBtnEl.classList.toggle('all-open', pastEventsOpen);
     calPastListEl.style.display = pastEventsOpen ? 'flex' : 'none';
+    if(mCalPastToggleBtnEl) mCalPastToggleBtnEl.classList.toggle('all-open', pastEventsOpen);
+    if(mCalPastListEl) mCalPastListEl.style.display = pastEventsOpen ? 'flex' : 'none';
     if(!pastEventsOpen) return;
 
     const header = `<div class="cal-past-popover-title">지난 일정${past.length ? ' (' + past.length + ')' : ''}</div>`;
 
-    if(past.length===0){
-      calPastListEl.innerHTML = header + `<div class="cal-upcoming-empty">지난 일정이 없어요</div>`;
-      return;
-    }
+    const bodyHtml = past.length===0
+      ? header + `<div class="cal-upcoming-empty">지난 일정이 없어요</div>`
+      : header + past.map(ev=>{
+        const s = fromISO(ev.start), e = fromISO(ev.end);
+        const rangeText = ev.start===ev.end
+          ? `${s.getMonth()+1}/${s.getDate()}`
+          : `${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}`;
+        return `<div class="cal-upcoming-item" style="margin-bottom:6px;">
+          <div class="u-main">
+            <div class="u-title" style="color:${ev.color || 'inherit'};">${escapeHtml(ev.title)}</div>
+            <div class="u-range">${rangeText}</div>
+          </div>
+          <div class="u-actions">
+            <button class="u-editbtn" data-action="past-edit" data-id="${ev.id}" title="수정">✎</button>
+            <button class="u-delbtn" data-action="past-del" data-id="${ev.id}" title="삭제">✕</button>
+          </div>
+        </div>`;
+      }).join('');
 
-    calPastListEl.innerHTML = header + past.map(ev=>{
-      const s = fromISO(ev.start), e = fromISO(ev.end);
-      const rangeText = ev.start===ev.end
-        ? `${s.getMonth()+1}/${s.getDate()}`
-        : `${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}`;
-      return `<div class="cal-upcoming-item" style="margin-bottom:6px;">
-        <div class="u-main">
-          <div class="u-title" style="color:${ev.color || 'inherit'};">${escapeHtml(ev.title)}</div>
-          <div class="u-range">${rangeText}</div>
-        </div>
-        <div class="u-actions">
-          <button class="u-editbtn" data-action="past-edit" data-id="${ev.id}" title="수정">✎</button>
-          <button class="u-delbtn" data-action="past-del" data-id="${ev.id}" title="삭제">✕</button>
-        </div>
-      </div>`;
-    }).join('');
+    calPastListEl.innerHTML = bodyHtml;
+    if(mCalPastListEl) mCalPastListEl.innerHTML = bodyHtml;
 
-    calPastListEl.querySelectorAll('[data-action="past-edit"]').forEach(el=>{
-      el.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        const ev = events.find(x=>x.id===el.dataset.id);
-        if(ev) openEventEditModal(ev);
+    [calPastListEl, mCalPastListEl].filter(Boolean).forEach(listEl=>{
+      listEl.querySelectorAll('[data-action="past-edit"]').forEach(el=>{
+        el.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const ev = events.find(x=>x.id===el.dataset.id);
+          if(ev) openEventEditModal(ev);
+        });
       });
-    });
-    calPastListEl.querySelectorAll('[data-action="past-del"]').forEach(el=>{
-      el.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        deleteEvent(el.dataset.id);
+      listEl.querySelectorAll('[data-action="past-del"]').forEach(el=>{
+        el.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          deleteEvent(el.dataset.id);
+        });
       });
     });
   }
@@ -4082,8 +4127,18 @@ function renderUpcomingEvents(){
     pastEventsOpen = !pastEventsOpen;
     renderPastEvents();
   });
+  if(mCalPastToggleBtnEl){
+    mCalPastToggleBtnEl.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      pastEventsOpen = !pastEventsOpen;
+      renderPastEvents();
+    });
+  }
   document.addEventListener('click', (e)=>{
-    if(pastEventsOpen && !calPastListEl.contains(e.target) && e.target !== calPastToggleBtnEl && !calPastToggleBtnEl.contains(e.target)){
+    if(!pastEventsOpen) return;
+    const insideAny = calPastListEl.contains(e.target) || e.target === calPastToggleBtnEl || calPastToggleBtnEl.contains(e.target)
+      || (mCalPastListEl && mCalPastListEl.contains(e.target)) || e.target === mCalPastToggleBtnEl || (mCalPastToggleBtnEl && mCalPastToggleBtnEl.contains(e.target));
+    if(!insideAny){
       pastEventsOpen = false;
       renderPastEvents();
     }
@@ -4178,7 +4233,7 @@ function renderUpcomingEvents(){
     mDailyBadgeEl.className = 'm-day-badge' + (isRedD?' sun':'');
     mDailyBadgeEl.innerHTML = `<span class="dow">${dow}</span><span class="num">${dateObj.getDate()}</span>`;
     const holN = holidayName(selectedDateISO);
-    mDailyDNameEl.textContent = `${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 (${dow})` + (holN ? ' · ' + holN : '');
+    mDailyDNameEl.innerHTML = `${dateObj.getMonth()+1}월 ${dateObj.getDate()}일 (${dow})` + (holN ? ` · <span style="color:var(--red);">${escapeHtml(holN)}</span>` : '');
 
     const chips = mobileEventChipsHtml(selectedDateISO);
     const mChipsBlock = chips.hasContent
@@ -4259,18 +4314,35 @@ function renderUpcomingEvents(){
     }
     listEl.innerHTML = upcoming.map(ev=>{
       const s = fromISO(ev.start);
-      const dateText = `${s.getMonth()+1}월 ${s.getDate()}일 ${DOW_KO[s.getDay()]}요일`;
-      return `<div class="m-upcoming-item" data-action="m-upcoming-jump" data-iso="${ev.start}" data-id="${ev.id}">
+      const dateText = `${s.getMonth()+1}/${s.getDate()} ${DOW_KO[s.getDay()]}${ev.dday ? ' ' + ddayLabel(ev) : ''}`;
+      return `<div class="m-upcoming-item" data-iso="${ev.start}" data-id="${ev.id}">
         <div class="m-upcoming-bar" style="background:${ev.color || 'var(--navy)'};"></div>
-        <div class="m-upcoming-body">
+        <div class="m-upcoming-body" data-action="m-upcoming-jump" data-iso="${ev.start}">
           <div class="m-upcoming-item-title">${escapeHtml(ev.title)}</div>
           <div class="m-upcoming-item-date">${dateText}</div>
+        </div>
+        <div class="m-upcoming-actions">
+          <button class="u-editbtn" data-action="m-upcoming-edit" data-id="${ev.id}" title="수정">✎</button>
+          <button class="u-delbtn" data-action="m-upcoming-del" data-id="${ev.id}" title="삭제">✕</button>
         </div>
       </div>`;
     }).join('');
 
     listEl.querySelectorAll('[data-action="m-upcoming-jump"]').forEach(el=>{
       el.addEventListener('click', ()=> pickDate(el.dataset.iso));
+    });
+    listEl.querySelectorAll('[data-action="m-upcoming-edit"]').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const ev = events.find(x=>x.id===el.dataset.id);
+        if(ev) openEventEditModal(ev);
+      });
+    });
+    listEl.querySelectorAll('[data-action="m-upcoming-del"]').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        deleteEvent(el.dataset.id);
+      });
     });
   }
 
@@ -4652,6 +4724,12 @@ function renderUpcomingEvents(){
   document.getElementById('calAddEventBtn').addEventListener('click', ()=>{
     openEventModal(toISO(new Date()));
   });
+  const mCalAddEventBtnEl = document.getElementById('mCalAddEventBtn');
+  if(mCalAddEventBtnEl){
+    mCalAddEventBtnEl.addEventListener('click', ()=>{
+      openEventModal(toISO(new Date()));
+    });
+  }
   document.getElementById('mGoTodayBtn').addEventListener('click', async ()=>{
     const todayISO = toISO(new Date());
     await pickDate(todayISO);
@@ -7977,9 +8055,10 @@ async function calRenderMonthData(year, month){
   const map = {};
   try{
     const list = await window.storage.list('diet:day:'+year+'-'+pad(month+1)+'-', false);
-    if(list && list.keys){
-      for(const key of list.keys){
-        const r = await window.storage.get(key, false);
+    if(list && list.keys && list.keys.length){
+      const results = await Promise.all(list.keys.map(key => window.storage.get(key, false).catch(()=>null)));
+      results.forEach((r, idx)=>{
+        const key = list.keys[idx];
         if(r && r.value){
           const d = JSON.parse(r.value);
           const dateISO = key.slice(9);
@@ -8001,25 +8080,38 @@ async function calRenderMonthData(year, month){
             map[dateISO] = { weight: d.weight||'', kcal: totalCal, ratio };
           }
         }
-      }
+      });
     }
   }catch(e){}
 
-  // 전날 대비 몸무게 증감 계산
+  // 전날 대비 몸무게 증감 계산 (필요한 전날 데이터만 모아서 한번에 병렬 조회)
   const weightDates = Object.keys(map).filter(d=>map[d].weight);
+  const neededPrevISOs = [];
+  for(const dISO of weightDates){
+    const prevISO = toISO(addDays(fromISO(dISO), -1));
+    if(!(map[prevISO] && map[prevISO].weight)) neededPrevISOs.push(prevISO);
+  }
+  const uniquePrev = [...new Set(neededPrevISOs)];
+  const prevWeightMap = {};
+  if(uniquePrev.length){
+    const prevResults = await Promise.all(uniquePrev.map(iso => window.storage.get('diet:day:'+iso, false).catch(()=>null)));
+    uniquePrev.forEach((iso, idx)=>{
+      const r = prevResults[idx];
+      if(r && r.value){
+        try{
+          const pd = JSON.parse(r.value);
+          if(pd.weight) prevWeightMap[iso] = parseFloat(pd.weight);
+        }catch(e){}
+      }
+    });
+  }
   for(const dISO of weightDates){
     const prevISO = toISO(addDays(fromISO(dISO), -1));
     let prevWeight = null;
     if(map[prevISO] && map[prevISO].weight){
       prevWeight = parseFloat(map[prevISO].weight);
-    } else {
-      try{
-        const r = await window.storage.get('diet:day:'+prevISO, false);
-        if(r && r.value){
-          const pd = JSON.parse(r.value);
-          if(pd.weight) prevWeight = parseFloat(pd.weight);
-        }
-      }catch(e){}
+    } else if(prevWeightMap[prevISO] !== undefined){
+      prevWeight = prevWeightMap[prevISO];
     }
     if(prevWeight!==null && !isNaN(prevWeight)){
       map[dISO].weightDiff = parseFloat(map[dISO].weight) - prevWeight;
