@@ -1376,6 +1376,11 @@
 #app-money .footer-actions {
     display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;
   }
+#app-money .modal-overlay {display:none;position:fixed;inset:0;background:rgba(46,34,20,.45);z-index:200;align-items:center;justify-content:center;padding:20px;}
+#app-money .modal-overlay.open {display:flex;}
+#app-money .modal-box {background:var(--card);border-radius:14px;padding:20px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 30px rgba(46,34,20,.25);}
+#app-money .modal-box h3 {margin:0 0 12px;font-size:15px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;}
+#app-money .modal-close {background:none;border:none;font-size:18px;cursor:pointer;color:var(--ink-soft);}
 #app-money .toast {
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:10px;
@@ -1536,8 +1541,8 @@
 #app-diet .cal-cell:hover {background:var(--sage-light);}
 #app-diet .cal-cell.blank {visibility:hidden;cursor:default;}
 #app-diet .cal-cell.today {border-color:var(--sage);}
-#app-diet .cal-cell.selected {background:var(--sage);}
-#app-diet .cal-cell.selected .cal-daynum, #app-diet .cal-cell.selected .cal-hol, #app-diet .cal-cell.selected .cal-weight, #app-diet .cal-cell.selected .cal-kcal, #app-diet .cal-cell.selected .cal-ratio {color:white !important;}
+#app-diet .cal-cell.holiday .cal-daynum {color:var(--clay);}
+#app-diet .cal-cell.selected {background:#C9E2CB;}
 #app-diet .cal-daynum {font-size:clamp(10px,3vw,12.5px);font-weight:800;color:#2a3142;}
 #app-diet .cal-cell.sun .cal-daynum {color:var(--clay);}
 #app-diet .cal-hol {font-size:clamp(6.5px,2vw,8.5px);color:var(--clay);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -1576,6 +1581,7 @@
         <button class="cal-navbtn header-navbtn" id="prevWeek" title="이전 주">‹</button>
         <span class="subrange" id="subRange"></span>
         <button class="cal-navbtn header-navbtn" id="nextWeek" title="다음 주">›</button>
+        <button class="navbtn" id="resetGearBtn" title="데이터 초기화" style="width:30px; height:30px; font-size:14px;">⚙</button>
         <div class="save-group">
           <button class="save-btn" id="saveBtn">저장</button>
           <span class="save-status" id="saveStatus"></span>
@@ -1634,6 +1640,7 @@
           <button class="cal-navbtn header-navbtn" id="mPrevWeek" title="이전 주">‹</button>
           <span class="subrange" id="mSubRange"></span>
           <button class="cal-navbtn header-navbtn" id="mNextWeek" title="다음 주">›</button>
+          <button class="navbtn" id="mResetGearBtn" title="데이터 초기화" style="width:28px; height:28px; font-size:13px;">⚙</button>
         </div>
         <div class="m-savegroup">
           <button class="save-btn" id="mSaveBtn">저장</button>
@@ -1732,6 +1739,30 @@
   </div>
 </div>
 
+<div class="confirm-overlay" id="wmResetOverlay">
+  <div class="confirm-box" style="max-width:320px;">
+    <div class="event-box-title">데이터 초기화</div>
+    <div style="font-size:11.5px; color:var(--muted); margin-bottom:10px;">Weekly · Monthly는 데이터가 연동돼 있어서, 아래에서 삭제하면 두 탭 모두에 반영돼요.</div>
+    <label class="event-field-label">시작일</label>
+    <input type="date" class="event-input" id="wmResetStart">
+    <label class="event-field-label">종료일</label>
+    <input type="date" class="event-input" id="wmResetEnd">
+    <div style="display:flex; flex-direction:column; gap:8px; margin:6px 0 14px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1a1f2e; cursor:pointer;">
+        <input type="checkbox" id="wmResetContent" style="width:auto;"> 내용 삭제 (카테고리·체크·메모·주말 기록)
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1a1f2e; cursor:pointer;">
+        <input type="checkbox" id="wmResetEvents" style="width:auto;"> 일정 삭제 (캘린더 이벤트)
+      </label>
+    </div>
+    <div style="font-size:11.5px; color:var(--red); min-height:16px; margin-bottom:6px;" id="wmResetErr"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" id="wmResetCancelBtn">취소</button>
+      <button class="confirm-btn danger" id="wmResetOkBtn">삭제</button>
+    </div>
+  </div>
+</div>
+
 
 </div>
 
@@ -1743,6 +1774,7 @@
     <div class="mp-title" id="mpTitle"></div>
     <button class="mp-navbtn" id="mpNextMonth" title="다음 달">›</button>
     <span class="mp-save-status" id="mpSaveStatus"></span>
+    <button class="mp-navbtn" id="mpResetGearBtn" title="데이터 초기화" style="font-size:14px;">⚙</button>
     <button class="mp-today-btn" id="mpTodayBtn" title="이번 달로 이동">오늘</button>
   </div>
 
@@ -1814,6 +1846,30 @@
     <div class="mp-modal-actions">
       <button type="button" class="mp-btn mp-btn-cancel" id="mpConfirmCancelBtn">취소</button>
       <button type="button" class="mp-btn mp-btn-danger" id="mpConfirmOkBtn">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="mp-overlay" id="mpResetOverlay">
+  <div class="mp-modal" style="max-width:320px;">
+    <div class="mp-modal-title" style="margin-bottom:12px;">데이터 초기화</div>
+    <div style="font-size:11.5px; color:var(--muted); margin-bottom:10px;">Weekly · Monthly는 데이터가 연동돼 있어서, 아래에서 삭제하면 두 탭 모두에 반영돼요.</div>
+    <label class="mp-field-label">시작일</label>
+    <input type="date" class="mp-input" id="mpResetStart">
+    <label class="mp-field-label">종료일</label>
+    <input type="date" class="mp-input" id="mpResetEnd">
+    <div style="display:flex; flex-direction:column; gap:8px; margin:6px 0 14px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1a1f2e; cursor:pointer;">
+        <input type="checkbox" id="mpResetContent" style="width:auto;"> 내용 삭제 (카테고리·체크·메모·주말 기록)
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#1a1f2e; cursor:pointer;">
+        <input type="checkbox" id="mpResetEvents" style="width:auto;"> 일정 삭제 (캘린더 이벤트)
+      </label>
+    </div>
+    <div style="font-size:11.5px; color:var(--red); min-height:16px; margin-bottom:6px;" id="mpResetErr"></div>
+    <div class="mp-modal-actions">
+      <button type="button" class="mp-btn mp-btn-cancel" id="mpResetCancelBtn">취소</button>
+      <button type="button" class="mp-btn mp-btn-danger" id="mpResetOkBtn">삭제</button>
     </div>
   </div>
 </div>
@@ -1944,9 +2000,22 @@
   <div class="footer-actions">
     <button class="btn btn-ghost" id="exportBtn">데이터 내보내기 (백업)</button>
     <button class="btn btn-ghost" id="importBtn">데이터 가져오기</button>
+    <button class="btn btn-ghost" id="moneyResetBtn">기간 초기화</button>
     <input type="file" id="importFile" accept="application/json">
   </div>
 
+</div>
+
+<div class="modal-overlay" id="moneyResetOverlay" onclick="if(event.target===this) closeMoneyResetModal()">
+  <div class="modal-box" style="max-width:340px;">
+    <h3>기간 초기화 <button class="modal-close" onclick="closeMoneyResetModal()">✕</button></h3>
+    <div style="font-size:11.5px; color:var(--ink-soft); margin-bottom:10px;">삭제할 조회기간을 선택해주세요.</div>
+    <div id="moneyResetList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;"></div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeMoneyResetModal()">취소</button>
+      <button class="btn btn-primary" style="background:var(--clay);" id="moneyResetOkBtn" onclick="confirmMoneyReset()">선택 기간 삭제</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2116,8 +2185,9 @@
         <div class="cal-title" id="dietCalTitle">-</div>
         <button onclick="calShiftMonth(1)">›</button>
       </div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-bottom:10px;">
         <button class="cal-today-btn" onclick="calGoToday()">이번 달로</button>
+        <button class="cal-today-btn" onclick="openDietResetModal()" title="기간 초기화" style="width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:13px;">⚙</button>
       </div>
       <div class="cal-dow-row" id="calDowRow"></div>
       <div class="cal-grid" id="dietCalGrid"></div>
@@ -2130,6 +2200,21 @@
   <div class="modal-box">
     <h3>⭐ 즐겨찾기 목록 <button class="modal-close" onclick="toggleFavPanel()">✕</button></h3>
     <div id="favListInner"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dietResetModal" onclick="if(event.target===this) closeDietResetModal()">
+  <div class="modal-box" style="max-width:340px;">
+    <h3>기간 초기화 <button class="modal-close" onclick="closeDietResetModal()">✕</button></h3>
+    <div class="row">
+      <div><label>시작일</label><input type="date" id="dietResetStart"></div>
+      <div><label>종료일</label><input type="date" id="dietResetEnd"></div>
+    </div>
+    <div style="font-size:11.5px; color:var(--sub); margin:4px 0 12px;">이 기간의 식단·운동·체중 기록이 삭제돼요. (냉장고, 즐겨찾기는 유지)</div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="action cancel" onclick="closeDietResetModal()">취소</button>
+      <button class="action" id="dietResetOkBtn" style="background:var(--clay);" onclick="confirmDietReset()">삭제</button>
+    </div>
   </div>
 </div>
 
@@ -6280,7 +6365,8 @@ function periodRangeLabel(monthStr){
   const [y,m] = monthStr.split('-').map(Number);
   let endY=y, endM=m+1;
   if(endM===13){ endM=1; endY=y+1; }
-  return `${y}년 ${m}/${PAYDAY} ~ ${endM}/${PAYDAY-1}`;
+  const yy = String(y).slice(-2);
+  return `${yy}년 ${m}/${PAYDAY} ~ ${endM}/${PAYDAY-1}`;
 }
 function nextSettlementDdayLabel(){
   const today = new Date();
@@ -6763,7 +6849,54 @@ function bindEvents(){
     };
     reader.readAsText(file);
   });
+
+  document.getElementById('moneyResetBtn').addEventListener('click', openMoneyResetModal);
 }
+
+async function openMoneyResetModal(){
+  const listEl = document.getElementById('moneyResetList');
+  listEl.innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">불러오는 중...</div>';
+  document.getElementById('moneyResetOverlay').classList.add('open');
+  let keys = [];
+  try{
+    const res = await window.storage.list('month:', false);
+    keys = (res && res.keys) ? res.keys : [];
+  }catch(e){}
+  keys.sort().reverse();
+  if(keys.length===0){
+    listEl.innerHTML = '<div style="font-size:12px; color:var(--ink-soft);">저장된 조회기간이 없어요</div>';
+    return;
+  }
+  listEl.innerHTML = keys.map(k=>{
+    const monthStr = k.slice('month:'.length);
+    return `<label style="display:flex; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 10px;">
+      <input type="checkbox" class="moneyResetCheck" data-key="${k}" style="width:auto;">
+      ${periodRangeLabel(monthStr)}
+    </label>`;
+  }).join('');
+}
+function closeMoneyResetModal(){
+  document.getElementById('moneyResetOverlay').classList.remove('open');
+}
+async function confirmMoneyReset(){
+  const checked = Array.from(document.querySelectorAll('.moneyResetCheck:checked')).map(el=>el.dataset.key);
+  if(checked.length===0){ toast('삭제할 기간을 선택해주세요'); return; }
+  const okBtn = document.getElementById('moneyResetOkBtn');
+  okBtn.disabled = true;
+  okBtn.textContent = '삭제 중...';
+  for(const key of checked){
+    try{ await window.storage.delete(key, false); }catch(e){}
+  }
+  okBtn.disabled = false;
+  okBtn.textContent = '선택 기간 삭제';
+  closeMoneyResetModal();
+  toast('선택한 기간을 초기화했어요');
+  await loadMonth(currentMonth);
+  document.getElementById('salaryInput').value = formatComma(String(monthData.salary||''));
+  render();
+}
+window.closeMoneyResetModal = closeMoneyResetModal;
+window.confirmMoneyReset = confirmMoneyReset;
 
 async function init(){
   await loadTemplate();
@@ -6784,6 +6917,101 @@ async function init(){
 }
 init();
 
+})();
+
+/* ===== Weekly + Monthly 공용: 데이터 초기화 (모달은 탭별로 따로, 삭제 로직만 공용) ===== */
+(function(){
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function toISO(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function fromISO(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+  function getMonday(d){
+    const nd = new Date(d);
+    const day = nd.getDay();
+    const diff = day===0 ? -6 : 1-day;
+    nd.setDate(nd.getDate()+diff);
+    nd.setHours(0,0,0,0);
+    return nd;
+  }
+
+  async function doReset(startISO, endISO, deleteContent, deleteEvents){
+    if(deleteEvents){
+      try{
+        const res = await window.storage.get('events', false);
+        let events = (res && res.value) ? JSON.parse(res.value) : [];
+        events = events.filter(ev => !(ev.start <= endISO && startISO <= ev.end));
+        await window.storage.set('events', JSON.stringify(events), false);
+      }catch(e){}
+    }
+    if(deleteContent){
+      try{
+        const list = await window.storage.list('week:', false);
+        if(list && list.keys){
+          const startMonday = getMonday(fromISO(startISO));
+          const endMonday = getMonday(fromISO(endISO));
+          for(const key of list.keys){
+            const mondayISO = key.slice('week:'.length);
+            const monday = fromISO(mondayISO);
+            if(monday >= startMonday && monday <= endMonday){
+              await window.storage.delete(key, false);
+            }
+          }
+        }
+      }catch(e){}
+    }
+  }
+
+  function wireModal(prefix, showFlex){
+    const overlay = document.getElementById(prefix+'Overlay');
+    if(!overlay) return;
+    const startInput = document.getElementById(prefix+'Start');
+    const endInput = document.getElementById(prefix+'End');
+    const contentCheck = document.getElementById(prefix+'Content');
+    const eventsCheck = document.getElementById(prefix+'Events');
+    const errEl = document.getElementById(prefix+'Err');
+    const okBtn = document.getElementById(prefix+'OkBtn');
+    const cancelBtn = document.getElementById(prefix+'CancelBtn');
+
+    function openModal(){
+      const today = new Date();
+      const iso = toISO(today);
+      startInput.value = iso;
+      endInput.value = iso;
+      contentCheck.checked = false;
+      eventsCheck.checked = false;
+      errEl.textContent = '';
+      overlay.style.display = 'flex';
+    }
+    function closeModal(){ overlay.style.display = 'none'; }
+
+    okBtn.addEventListener('click', async ()=>{
+      const s = startInput.value, e = endInput.value;
+      if(!s || !e){ errEl.textContent = '시작일과 종료일을 입력해주세요.'; return; }
+      if(s > e){ errEl.textContent = '종료일이 시작일보다 뒤여야 해요.'; return; }
+      if(!contentCheck.checked && !eventsCheck.checked){ errEl.textContent = '내용 또는 일정 중 하나는 선택해주세요.'; return; }
+      errEl.textContent = '';
+      okBtn.disabled = true;
+      okBtn.textContent = '삭제 중...';
+      await doReset(s, e, contentCheck.checked, eventsCheck.checked);
+      okBtn.disabled = false;
+      okBtn.textContent = '삭제';
+      closeModal();
+      location.reload();
+    });
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+
+    return openModal;
+  }
+
+  const openWeeklyModal = wireModal('wmReset');
+  const openMonthlyModal = wireModal('mpReset');
+
+  const gear1 = document.getElementById('resetGearBtn');
+  const gear2 = document.getElementById('mResetGearBtn');
+  const gear3 = document.getElementById('mpResetGearBtn');
+  if(gear1 && openWeeklyModal) gear1.addEventListener('click', openWeeklyModal);
+  if(gear2 && openWeeklyModal) gear2.addEventListener('click', openWeeklyModal);
+  if(gear3 && openMonthlyModal) gear3.addEventListener('click', openMonthlyModal);
 })();
 
 
@@ -7450,7 +7678,7 @@ async function renderCalendarMonth(){
     const isToday = dISO===todayISO;
     const isSelected = dISO===currentDate;
     const info = dataMap[dISO];
-    html += `<div class="cal-cell ${isSun?'sun':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-iso="${dISO}" onclick="calPickDate('${dISO}')">
+    html += `<div class="cal-cell ${isSun?'sun':''} ${hol?'holiday':''} ${isToday?'today':''} ${isSelected?'selected':''}" data-iso="${dISO}" onclick="calPickDate('${dISO}')">
       <span class="cal-daynum">${day}</span>
       ${hol?`<span class="cal-hol">${hol}</span>`:''}
       ${info && info.weight?`<span class="cal-weight">${info.weight}kg${info.weightDiff!==undefined ? `<span class="cal-weight-diff" style="color:${info.weightDiff>0?'var(--blue)':(info.weightDiff<0?'var(--clay)':'var(--sub)')};">(${info.weightDiff>0?'+':''}${info.weightDiff.toFixed(1)})</span>` : ''}</span>`:''}
@@ -7474,6 +7702,41 @@ function calGoToday(){
 async function calPickDate(iso){
   await loadDay(iso);
   switchTab('cal');
+}
+
+function openDietResetModal(){
+  const today = toISO(new Date());
+  document.getElementById('dietResetStart').value = today;
+  document.getElementById('dietResetEnd').value = today;
+  document.getElementById('dietResetModal').classList.add('open');
+}
+function closeDietResetModal(){
+  document.getElementById('dietResetModal').classList.remove('open');
+}
+async function confirmDietReset(){
+  const s = document.getElementById('dietResetStart').value;
+  const e = document.getElementById('dietResetEnd').value;
+  if(!s || !e){ alert('시작일과 종료일을 입력해주세요'); return; }
+  if(s > e){ alert('종료일이 시작일보다 뒤여야 해요'); return; }
+  const okBtn = document.getElementById('dietResetOkBtn');
+  okBtn.disabled = true;
+  okBtn.textContent = '삭제 중...';
+  try{
+    const list = await window.storage.list('diet:day:', false);
+    if(list && list.keys){
+      for(const key of list.keys){
+        const dISO = key.slice('diet:day:'.length);
+        if(dISO >= s && dISO <= e){
+          await window.storage.delete(key, false);
+        }
+      }
+    }
+  }catch(e2){}
+  okBtn.disabled = false;
+  okBtn.textContent = '삭제';
+  closeDietResetModal();
+  await loadDay(currentDate);
+  if(document.getElementById('panel-calendar').classList.contains('active')) renderCalendarMonth();
 }
 
 pickZone('냉장');
@@ -7510,6 +7773,9 @@ window.switchZoneTab = switchZoneTab;
 window.calShiftMonth = calShiftMonth;
 window.calGoToday = calGoToday;
 window.calPickDate = calPickDate;
+window.openDietResetModal = openDietResetModal;
+window.closeDietResetModal = closeDietResetModal;
+window.confirmDietReset = confirmDietReset;
 
 })();
 </script>
