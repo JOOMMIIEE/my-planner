@@ -8120,17 +8120,11 @@ async function calRenderMonthData(year, month){
   return map;
 }
 
-async function renderCalendarMonth(){
-  const year = calMonthDate.getFullYear();
-  const month = calMonthDate.getMonth();
-  document.getElementById('dietCalTitle').textContent = year+'년 '+(month+1)+'월';
-  document.getElementById('calDowRow').innerHTML = ['일','월','화','수','목','금','토'].map((d,i)=>`<span class="${i===0?'sun':''}">${d}</span>`).join('');
-
+function buildCalendarGridHtml(year, month, dataMap){
   const firstOfMonth = new Date(year, month, 1);
   const startOffset = firstOfMonth.getDay();
   const total = new Date(year, month+1, 0).getDate();
   const todayISO = toISO(new Date());
-  const dataMap = await calRenderMonthData(year, month);
 
   let html = '';
   for(let i=0;i<startOffset;i++) html += `<div class="cal-cell blank"></div>`;
@@ -8156,8 +8150,19 @@ async function renderCalendarMonth(){
   const used = startOffset+total;
   const trailing = 42-used;
   for(let i=0;i<trailing;i++) html += `<div class="cal-cell blank"></div>`;
-  document.getElementById('dietCalGrid').innerHTML = html;
+  return html;
 }
+
+async function renderCalendarMonth(){
+  const year = calMonthDate.getFullYear();
+  const month = calMonthDate.getMonth();
+  document.getElementById('dietCalTitle').textContent = year+'년 '+(month+1)+'월';
+  document.getElementById('calDowRow').innerHTML = ['일','월','화','수','목','금','토'].map((d,i)=>`<span class="${i===0?'sun':''}">${d}</span>`).join('');
+
+  const dataMap = await calRenderMonthData(year, month);
+  document.getElementById('dietCalGrid').innerHTML = buildCalendarGridHtml(year, month, dataMap);
+}
+
 function calShiftMonth(delta){
   calMonthDate = new Date(calMonthDate.getFullYear(), calMonthDate.getMonth()+delta, 1);
   renderCalendarMonth();
