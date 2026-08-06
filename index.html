@@ -1022,6 +1022,9 @@
     z-index: 100;
     transform: translate(12px, -50%);
   }
+#app-routine .today-col { border-left:2px solid var(--accent) !important; border-right:2px solid var(--accent) !important; }
+#app-routine .today-col-top { border-top:2px solid var(--accent) !important; }
+#app-routine .today-col-bottom { border-bottom:2px solid var(--accent) !important; }
 #app-routine .now-line {
     position: absolute;
     height: 2px;
@@ -6013,6 +6016,24 @@ function render() {
 
   applyDayVisibility();
   updateNowLine();
+  highlightTodayColumn();
+}
+
+function highlightTodayColumn(){
+  document.querySelectorAll('#routine-table .today-col, #routine-table .today-col-top, #routine-table .today-col-bottom').forEach(el=>{
+    el.classList.remove('today-col', 'today-col-top', 'today-col-bottom');
+  });
+  const jsDow = new Date().getDay(); // 0=일 1=월 ... 6=토
+  const todayKey = DAYS[(jsDow + 6) % 7]; // DAYS = [mon,tue,wed,thu,fri,sat,sun]
+  const cells = Array.from(document.querySelectorAll(`#routine-table [data-day="${todayKey}"]`));
+  if(cells.length === 0) return;
+  cells.forEach(el => el.classList.add('today-col'));
+  const headerCell = document.querySelector(`#routine-table thead [data-day="${todayKey}"]`);
+  if(headerCell) headerCell.classList.add('today-col-top');
+  const bodyCells = cells.filter(el => el.tagName === 'TD');
+  if(bodyCells.length){
+    bodyCells[bodyCells.length - 1].classList.add('today-col-bottom');
+  }
 }
 
 function renderDayGroupNav() {
@@ -6380,6 +6401,10 @@ function triggerUndo() {
   activeId = appData.defaultId;
   state = appData.routines[activeId];
   syncDayStartFromActiveRoutine();
+  const jsDow0 = new Date().getDay();
+  const todayKey0 = DAYS[(jsDow0 + 6) % 7];
+  const initGroupIdx = DAY_GROUPS.findIndex(g => g.includes(todayKey0));
+  if(initGroupIdx !== -1) dayGroupIndex = initGroupIdx;
   renderTabs();
   renderDayGroupNav();
   render();
