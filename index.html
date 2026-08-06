@@ -1450,21 +1450,21 @@
 #app-diet button.action.cancel {background:var(--sub);}
 #app-diet button.ghost {background:none;border:1px solid var(--line);color:var(--sub);padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;}
 #app-diet button.ghost:hover {background:var(--sage-light);color:var(--sage-deep);}
-#app-diet button.icon-btn {background:none;border:none;cursor:pointer;font-size:14px;padding:3px 5px;border-radius:5px;}
+#app-diet button.icon-btn {background:none;border:none;cursor:pointer;font-size:14px;padding:3px 2px;border-radius:5px;}
 #app-diet button.icon-btn.edit {color:var(--mustard);}
 #app-diet button.icon-btn.edit:hover {background:#FBEAD9;}
 #app-diet button.icon-btn.del {color:var(--clay);}
 #app-diet button.icon-btn.del:hover {background:var(--clay-light);}
 #app-diet table {width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
-#app-diet th {text-align:left;padding:6px 4px;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line);font-size:11.5px;}
-#app-diet td {padding:8px 4px;border-bottom:1px solid var(--sage-light);}
+#app-diet th {text-align:left;padding:6px 4px;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;}
+#app-diet td {padding:8px 4px;border-bottom:1px solid var(--sage-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-diet tr:last-child td {border-bottom:none;}
 #app-diet .col-name {width:32%;}
 #app-diet .col-num {width:14%;text-align:right;}
 #app-diet .col-cal {width:16%;text-align:right;font-weight:700;color:var(--sage-deep);}
 #app-diet .col-act {width:10%;text-align:right;white-space:nowrap;}
-#app-diet th.col-num, #app-diet th.col-cal {text-align:right;}
-#app-diet td.col-num, #app-diet td.col-cal {text-align:right;font-variant-numeric:tabular-nums;}
+#app-diet th.col-num, #app-diet th.col-cal {text-align:center;}
+#app-diet td.col-num, #app-diet td.col-cal {text-align:center;font-variant-numeric:tabular-nums;}
 #app-diet .status-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
 #app-diet .stat-box {background:var(--sage-light);border-radius:10px;padding:12px 14px;}
 #app-diet .stat-box .lbl {font-size:11.5px;color:var(--sage-deep);font-weight:600;}
@@ -1505,7 +1505,7 @@
 #app-diet .meal-section {margin-top:16px;}
 #app-diet .meal-title {font-size:13px;font-weight:800;color:var(--sage-deep);display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:2px solid var(--sage-light);margin-bottom:4px;}
 #app-diet .meal-title .sub-total {font-size:12px;font-weight:700;color:var(--mustard);}
-#app-diet .badge {font-size:11px;padding:2px 7px;border-radius:10px;font-weight:600;}
+#app-diet .badge {font-size:clamp(8px,2.4vw,11px);padding:2px 6px;border-radius:10px;font-weight:600;white-space:nowrap;display:inline-block;}
 #app-diet .badge.ok {background:var(--sage-light);color:var(--sage-deep);}
 #app-diet .badge.soon {background:#FBEAD9;color:var(--mustard);}
 #app-diet .badge.over {background:var(--clay-light);color:var(--clay);}
@@ -1542,6 +1542,18 @@
     cursor:pointer; flex-shrink:0; user-select:none;
   }
 #app-diet .diet-meal-badge:hover { filter:brightness(0.95); }
+#app-diet .fridge-expire-disp { font-size:12.5px; color:var(--ink); vertical-align:middle; white-space:nowrap; }
+#app-diet .fridge-expire-iconwrap { position:relative; width:14px; height:14px; flex-shrink:0; color:var(--sub); display:inline-block; vertical-align:middle; }
+#app-diet .fridge-expire-icon { width:14px; height:14px; display:block; }
+#app-diet .fridge-expire-hidden { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; border:none; padding:0; }
+#app-diet .diet-slot-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600;
+    cursor:pointer; white-space:nowrap;
+  }
+#app-diet .diet-slot-badge.zone-냉장 { background:var(--clay-light); color:var(--clay); }
+#app-diet .diet-slot-badge.zone-냉동 { background:var(--blue-light); color:var(--blue); }
+#app-diet .diet-slot-badge:hover { filter:brightness(0.96); }
 #app-diet input.etext-date {
     width:100%;box-sizing:border-box;height:24px;padding:0 3px;font-size:11px;border:1px solid var(--sage);border-radius:4px;
     background:var(--sage-light);
@@ -2020,12 +2032,25 @@
   </div>
 
   <div class="footer-actions">
+    <button class="btn btn-ghost" id="buyListBtn">🛒 구매 목록</button>
     <button class="btn btn-ghost" id="exportBtn">데이터 내보내기 (백업)</button>
     <button class="btn btn-ghost" id="importBtn">데이터 가져오기</button>
     <button class="btn btn-ghost" id="moneyResetBtn">기간 초기화</button>
     <input type="file" id="importFile" accept="application/json">
   </div>
 
+</div>
+
+<div class="modal-overlay" id="buyListOverlay" onclick="if(event.target===this) closeBuyListModal()">
+  <div class="modal-box" style="max-width:360px;">
+    <h3>🛒 이번 기간 구매 목록 <button class="modal-close" onclick="closeBuyListModal()">✕</button></h3>
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <input type="text" id="buyListInput" placeholder="살 것 입력 (예: 우유)" style="flex:1; border:1px solid var(--line); border-radius:7px; padding:7px 9px; font-size:13px; font-family:inherit; background:#fff;">
+      <button class="btn btn-primary" id="buyListAddBtn">추가</button>
+    </div>
+    <div id="buyListItems" style="display:flex; flex-direction:column; gap:4px; max-height:320px; overflow-y:auto;"></div>
+    <div id="buyListEmpty" style="font-size:12.5px; color:var(--ink-soft); text-align:center; padding:10px 0; display:none;">아직 담긴 항목이 없어요</div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="moneyResetOverlay" onclick="if(event.target===this) closeMoneyResetModal()">
@@ -6490,6 +6515,65 @@ async function storageSet(key, value){
   catch(e){ console.error('storage set failed', e); }
 }
 
+let buyList = [];
+async function loadBuyList(){
+  const saved = await storageGet('buylist:' + currentMonth);
+  buyList = Array.isArray(saved) ? saved : [];
+}
+async function saveBuyList(){
+  await storageSet('buylist:' + currentMonth, buyList);
+}
+function renderBuyList(){
+  const container = document.getElementById('buyListItems');
+  const emptyEl = document.getElementById('buyListEmpty');
+  if(buyList.length === 0){
+    container.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  container.innerHTML = buyList.map(item => `
+    <label style="display:flex; align-items:center; gap:8px; padding:7px 9px; border-radius:8px; background:var(--card); border:1px solid var(--line); cursor:pointer;">
+      <input type="checkbox" data-buy-id="${item.id}" ${item.checked ? 'checked' : ''} style="width:16px; height:16px; flex-shrink:0;">
+      <span style="flex:1; font-size:13px; ${item.checked ? 'text-decoration:line-through; color:var(--ink-soft);' : 'color:var(--ink);'}">${moneyEscapeHtml(item.text)}</span>
+      <span data-buy-del="${item.id}" style="cursor:pointer; color:var(--clay); font-weight:700; font-size:13px; padding:0 2px;">×</span>
+    </label>
+  `).join('');
+  container.querySelectorAll('[data-buy-id]').forEach(cb=>{
+    cb.addEventListener('change', async ()=>{
+      const item = buyList.find(x=>x.id===cb.dataset.buyId);
+      if(item){ item.checked = cb.checked; await saveBuyList(); renderBuyList(); }
+    });
+  });
+  container.querySelectorAll('[data-buy-del]').forEach(del=>{
+    del.addEventListener('click', async ()=>{
+      buyList = buyList.filter(x=>x.id!==del.dataset.buyDel);
+      await saveBuyList(); renderBuyList();
+    });
+  });
+}
+async function openBuyListModal(){
+  await loadBuyList();
+  renderBuyList();
+  document.getElementById('buyListOverlay').classList.add('open');
+  document.getElementById('buyListInput').value = '';
+  setTimeout(()=> document.getElementById('buyListInput').focus(), 0);
+}
+function closeBuyListModal(){
+  document.getElementById('buyListOverlay').classList.remove('open');
+}
+async function addBuyListItem(){
+  const input = document.getElementById('buyListInput');
+  const text = input.value.trim();
+  if(!text) return;
+  buyList.push({ id: 'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), text, checked:false });
+  await saveBuyList();
+  input.value = '';
+  renderBuyList();
+  input.focus();
+}
+window.closeBuyListModal = closeBuyListModal;
+
 function defaultTemplate(){
   const t = {};
   CATEGORY_TEMPLATE.forEach(cat=>{
@@ -6920,6 +7004,11 @@ function bindEvents(){
   });
 
   document.getElementById('moneyResetBtn').addEventListener('click', openMoneyResetModal);
+  document.getElementById('buyListBtn').addEventListener('click', openBuyListModal);
+  document.getElementById('buyListAddBtn').addEventListener('click', addBuyListItem);
+  document.getElementById('buyListInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addBuyListItem(); }
+  });
 }
 
 async function openMoneyResetModal(){
@@ -7109,6 +7198,18 @@ function fromISO(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m
 function addDays(d,n){ const nd=new Date(d); nd.setDate(nd.getDate()+n); return nd; }
 const fmt = n => (Math.round(n*100)/100).toFixed(2);
 
+function dietShrinkToFit(el, basePx, minPx){
+  if(!el) return;
+  el.style.fontSize = basePx + 'px';
+  let size = basePx;
+  let guard = 0;
+  while(size > minPx && el.scrollWidth > el.clientWidth + 1 && guard < 20){
+    size -= 0.5;
+    el.style.fontSize = size + 'px';
+    guard++;
+  }
+}
+
 const LUNAR_TABLE = {
   2020:['01-25','10-01','04-30'], 2021:['02-12','09-21','05-19'], 2022:['02-01','09-10','05-08'],
   2023:['01-22','09-29','05-27'], 2024:['02-10','09-17','05-15'], 2025:['01-29','10-06','05-05'],
@@ -7226,6 +7327,10 @@ let selectedZone = '냉장';
 const SLOT_OPTIONS = {
   '냉장': ['소스 칸','문 앞 칸','계란 칸','MY 냉장고'],
   '냉동': ['위쪽 칸','윗 서랍','아래 서랍','문 안 칸']
+};
+const SLOT_SHORT_LABELS = {
+  '소스 칸':'소스', '문 앞 칸':'문 앞', '계란 칸':'계란', 'MY 냉장고':'MY',
+  '위쪽 칸':'윗 칸', '윗 서랍':'서랍(위)', '아래 서랍':'서랍(아래)', '문 안 칸':'문 안'
 };
 
 async function loadDay(dateISO){
@@ -7471,7 +7576,7 @@ function renderFoods(){
     const subtotal = items.reduce((a,f)=>a+f.cal,0);
     html += `<div class="meal-section"><div class="meal-title"><span>${meal}</span><span class="sub-total">${fmt(subtotal)} kcal</span></div>
       <table><colgroup><col class="col-name"><col class="col-num"><col class="col-num"><col class="col-num"><col class="col-cal"><col class="col-act" style="width:14%;"></colgroup>
-      <thead><tr><th class="col-name">음식</th><th class="col-num">탄</th><th class="col-num">단</th><th class="col-num">지</th><th class="col-cal">kcal</th><th class="col-act"></th></tr></thead><tbody>`;
+      <thead><tr><th class="col-name" style="padding-left:38px;">음식</th><th class="col-num">탄</th><th class="col-num">단</th><th class="col-num">지</th><th class="col-cal">kcal</th><th class="col-act"></th></tr></thead><tbody>`;
     items.forEach(f=>{
       html += `<tr data-food-row="${f.idx}">
           <td class="col-name"><div style="display:flex; align-items:center; gap:6px;">${mealBadgeHtml(f.meal, f.idx)}<span class="etext" data-field="name" contenteditable="true" style="flex:1; min-width:0;">${f.name}</span></div></td>
@@ -7480,7 +7585,7 @@ function renderFoods(){
           <td class="col-num"><span class="etext" data-field="fat" contenteditable="true">${f.fat||''}</span></td>
           <td class="col-cal"><span class="etext" data-field="cal" contenteditable="true">${f.cal}</span></td>
           <td class="col-act">
-            <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:0;">
               <button class="icon-btn fav" onclick="saveFoodItemAsFav(${f.idx})" title="즐겨찾기에 저장">⭐</button>
               <button class="icon-btn del" onclick="removeFood(${f.idx})" title="삭제">✕</button>
             </div>
@@ -7498,6 +7603,10 @@ function renderFoods(){
     el.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter'){ e.preventDefault(); el.blur(); }
     });
+  });
+  container.querySelectorAll('[data-field="name"]').forEach(el=>{
+    dietShrinkToFit(el, 13, 8);
+    el.addEventListener('input', ()=> dietShrinkToFit(el, 13, 8));
   });
   container.querySelectorAll('.diet-meal-badge').forEach(el=>{
     el.addEventListener('click', (e)=>{
@@ -7627,25 +7736,57 @@ function cancelItemEdit(){
   setDefaultDates();
   document.getElementById('itemCancelBtn').style.display = 'none';
 }
-let inlineEditIdx = null;
-function editItem(i){ inlineEditIdx = i; renderFridge(); }
-function cancelInlineEdit(){ inlineEditIdx = null; renderFridge(); }
-function saveInlineEdit(i){
-  const name = document.getElementById('finItemName-'+i).textContent.trim();
-  const slot = document.getElementById('finItemSlot-'+i).value;
-  const expire = document.getElementById('finItemExpire-'+i).value;
-  const purpose = document.getElementById('finItemPurpose-'+i).textContent.trim();
-  if(!name){ alert('재료 이름을 입력해주세요'); return; }
-  fridgeItems[i] = {...fridgeItems[i], name, slot, expire, purpose};
-  saveFridge(); inlineEditIdx = null; renderFridge();
+function commitFridgeField(i){
+  const row = document.querySelector(`[data-fridge-row="${i}"]`);
+  if(!row) return;
+  const name = row.querySelector('[data-field="name"]').textContent.trim();
+  const purpose = row.querySelector('[data-field="purpose"]').textContent.trim();
+  const expireInput = row.querySelector('[data-field="expire"]');
+  const expire = expireInput ? expireInput.value : fridgeItems[i].expire;
+  if(!name) return; // 이름을 다 지운 채로 벗어나면 저장하지 않고 원래 값 유지
+  fridgeItems[i] = {...fridgeItems[i], name, purpose, expire};
+  saveFridge(); renderFridge();
 }
+let pendingSlotIdx = null;
+let pendingSlotValue = null;
+let pendingSlotIdleTimer = null;
+function commitPendingSlot(){
+  if(pendingSlotIdx === null) return;
+  clearTimeout(pendingSlotIdleTimer);
+  if(fridgeItems[pendingSlotIdx]){
+    fridgeItems[pendingSlotIdx].slot = pendingSlotValue;
+    saveFridge();
+  }
+  pendingSlotIdx = null;
+  pendingSlotValue = null;
+  renderFridge();
+}
+function handleSlotBadgeClick(el, i){
+  if(pendingSlotIdx !== null && pendingSlotIdx !== i){
+    commitPendingSlot();
+    return;
+  }
+  const it = fridgeItems[i];
+  const opts = SLOT_OPTIONS[it.zone];
+  if(pendingSlotIdx === null){
+    pendingSlotIdx = i;
+    pendingSlotValue = it.slot;
+  }
+  const curIdx = opts.indexOf(pendingSlotValue);
+  pendingSlotValue = opts[(curIdx+1) % opts.length];
+  el.textContent = SLOT_SHORT_LABELS[pendingSlotValue] || pendingSlotValue;
+  clearTimeout(pendingSlotIdleTimer);
+  pendingSlotIdleTimer = setTimeout(commitPendingSlot, 3000);
+}
+document.addEventListener('click', ()=>{ commitPendingSlot(); });
+window.addEventListener('scroll', ()=>{ commitPendingSlot(); }, true);
 function shortDate(d){
   if(!d) return '-';
   const parts = d.split('-');
   if(parts.length!==3) return d;
   return parts[0].slice(2)+'.'+parts[1]+'.'+parts[2];
 }
-function removeItem(i){ fridgeItems.splice(i,1); saveFridge(); renderFridge(); if(inlineEditIdx===i) cancelInlineEdit(); }
+function removeItem(i){ fridgeItems.splice(i,1); saveFridge(); renderFridge(); }
 function statusBadge(expire){
   if(!expire) return `<span class="badge ok">-</span>`;
   const today = new Date(); today.setHours(0,0,0,0);
@@ -7658,7 +7799,6 @@ function statusBadge(expire){
 let activeZoneTab = '냉장';
 function switchZoneTab(z){
   activeZoneTab = z;
-  inlineEditIdx = null;
   document.getElementById('zoneTabBtn-냉장').classList.toggle('active', z==='냉장');
   document.getElementById('zoneTabBtn-냉동').classList.toggle('active', z==='냉동');
   renderFridge();
@@ -7674,42 +7814,67 @@ function renderFridge(){
       .sort((a,b)=>{ if(!a.expire) return 1; if(!b.expire) return -1; return fromISO(a.expire)-fromISO(b.expire); });
     if(items.length===0) return;
     html += `<div class="meal-section"><div class="meal-title"><span>${slot}</span><span class="sub-total">${items.length}개</span></div>
-      <table><colgroup><col style="width:30%"><col style="width:14%"><col style="width:10%"><col style="width:18%"><col style="width:28%"></colgroup>
-      <thead><tr><th>재료</th><th>소비기한</th><th>상태</th><th>용도</th><th></th></tr></thead><tbody>`;
+      <table><colgroup><col><col style="width:70px"><col style="width:48px"><col><col style="width:26px"></colgroup>
+      <thead><tr><th style="text-align:left; padding-left:56px;">재료</th><th style="text-align:center;">소비기한</th><th style="text-align:center;">상태</th><th>용도</th><th></th></tr></thead><tbody>`;
     items.forEach(it=>{
-      if(inlineEditIdx===it.idx){
-        const slotOpts = SLOT_OPTIONS[it.zone].map(s=>`<option value="${s}" ${s===it.slot?'selected':''}>${s}</option>`).join('');
-        html += `<tr>
-          <td><span class="etext" id="finItemName-${it.idx}" contenteditable="true">${it.name}</span></td>
-          <td><input type="date" class="etext-date" id="finItemExpire-${it.idx}" value="${it.expire||''}"></td>
-          <td>-</td>
-          <td><span class="etext" id="finItemPurpose-${it.idx}" contenteditable="true">${it.purpose||''}</span></td>
-          <td style="white-space:nowrap;">
-            <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
-              <select class="etext-meal" id="finItemSlot-${it.idx}">${slotOpts}</select>
-              <button class="icon-btn edit" onclick="saveInlineEdit(${it.idx})" title="저장">✓</button>
-              <button class="icon-btn del" onclick="cancelInlineEdit()" title="취소">✕</button>
+      html += `<tr data-fridge-row="${it.idx}">
+          <td>
+            <div style="display:flex; align-items:center; justify-content:flex-start; gap:6px;">
+              <span class="diet-slot-badge zone-${it.zone}" data-idx="${it.idx}" title="탭하면 보관 위치가 바뀌고, 다른 곳을 누르면 그쪽으로 옮겨가요">${SLOT_SHORT_LABELS[it.slot] || it.slot}</span>
+              <span class="etext" data-field="name" contenteditable="true" style="display:block; flex:1; min-width:0; overflow:hidden; text-align:left;">${it.name}</span>
             </div>
           </td>
-        </tr>`;
-      } else {
-        html += `<tr>
-          <td>${it.name}</td>
-          <td>${shortDate(it.expire)}</td>
-          <td>${statusBadge(it.expire)}</td>
-          <td>${it.purpose||'-'}</td>
-          <td style="white-space:nowrap;">
-            <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
-              <button class="icon-btn edit" onclick="editItem(${it.idx})" title="수정">✎</button>
+          <td style="white-space:nowrap; overflow:visible; padding-right:10px;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:1px; line-height:1;">
+              <span class="fridge-expire-disp" style="line-height:1;">${shortDate(it.expire)}</span>
+              <span class="fridge-expire-iconwrap">
+                <svg class="fridge-expire-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/>
+                  <path d="M8 3V6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M16 3V6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                <input type="date" class="fridge-expire-hidden" data-field="expire" value="${it.expire||''}">
+              </span>
+            </div>
+          </td>
+          <td style="text-align:center; padding:8px 4px; overflow:visible; white-space:nowrap;">${statusBadge(it.expire)}</td>
+          <td style="padding:8px 4px;"><span class="etext" data-field="purpose" contenteditable="true" style="display:block; width:100%; overflow:hidden; text-align:left;">${it.purpose||''}</span></td>
+          <td style="white-space:nowrap; padding:8px 2px;">
+            <div style="display:flex;align-items:center;justify-content:flex-end;">
               <button class="icon-btn del" onclick="removeItem(${it.idx})" title="삭제">✕</button>
             </div>
           </td>
         </tr>`;
-      }
     });
     html += `</tbody></table></div>`;
   });
   container.innerHTML = html || `<div class="empty">${activeZoneTab}에 저장된 재료가 없어요</div>`;
+  container.querySelectorAll('.fridge-expire-hidden').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const row = el.closest('[data-fridge-row]');
+      if(row) commitFridgeField(+row.dataset.fridgeRow);
+    });
+  });
+  container.querySelectorAll('.diet-slot-badge').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      handleSlotBadgeClick(el, +el.dataset.idx);
+    });
+  });
+  container.querySelectorAll('[data-field]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      const row = el.closest('[data-fridge-row]');
+      if(row) commitFridgeField(+row.dataset.fridgeRow);
+    });
+    el.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && el.tagName !== 'INPUT'){ e.preventDefault(); el.blur(); }
+    });
+  });
+  container.querySelectorAll('[data-field="name"], [data-field="purpose"]').forEach(el=>{
+    dietShrinkToFit(el, 12.5, 8);
+    el.addEventListener('input', ()=> dietShrinkToFit(el, 12.5, 8));
+  });
 }
 
 let calMonthDate = new Date();
@@ -7877,9 +8042,6 @@ window.removeFav = removeFav;
 window.pickZone = pickZone;
 window.submitItem = submitItem;
 window.cancelItemEdit = cancelItemEdit;
-window.editItem = editItem;
-window.cancelInlineEdit = cancelInlineEdit;
-window.saveInlineEdit = saveInlineEdit;
 window.removeItem = removeItem;
 window.switchZoneTab = switchZoneTab;
 window.calShiftMonth = calShiftMonth;
