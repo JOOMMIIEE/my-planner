@@ -66,6 +66,13 @@
 <style>
   *{ box-sizing:border-box; }
   html, body{ margin:0; padding:0; height:100%; width:100%; overflow-x:hidden; font-family:'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif; }
+  /* 아이폰 사파리가 날짜/시간 입력창을 다른 입력창보다 넓게 그리는 문제 방지 - 같이 있는 칸들이랑 폭을 강제로 통일 */
+  input[type="date"], input[type="time"], input[type="month"] {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
 
   #tabbar{
     display:flex; gap:6px; padding:10px 12px 0;
