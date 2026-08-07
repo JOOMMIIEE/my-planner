@@ -258,7 +258,7 @@
   }
 #app-planner .confirm-box {
     background:#fff; border-radius:12px; padding:20px 20px 16px; max-width:320px; width:100%;
-    box-shadow:0 12px 32px rgba(20,25,45,0.25);
+    box-shadow:0 12px 32px rgba(20,25,45,0.25); box-sizing:border-box; overflow-x:hidden;
   }
 #app-planner .confirm-msg { font-size:13.5px; color:#1a1f2e; line-height:1.6; white-space:pre-line; margin-bottom:16px; }
 #app-planner .confirm-actions { display:flex; gap:8px; justify-content:flex-end; }
@@ -271,7 +271,7 @@
 #app-planner .confirm-btn.danger:hover { background:#c23a32; }
 #app-planner .confirm-btn.primary { background:var(--navy); color:#fff; }
 #app-planner .confirm-btn.primary:hover { background:var(--navy-2); }
-#app-planner .event-box { max-width:340px; }
+#app-planner .event-box { max-width:340px; overflow-x:hidden; }
 #app-planner .event-box-title { font-weight:800; color:var(--navy); font-size:14.5px; margin-bottom:12px; }
 #app-planner .event-field-label { display:block; font-size:11.5px; color:var(--muted); font-weight:700; margin-bottom:4px; }
 #app-planner .event-input {
@@ -1204,7 +1204,7 @@
   }
 @media (max-width: 400px) {
   #app-routine .overlay { padding: 8px; }
-  #app-routine .modal { padding: 16px 14px; }
+  #app-routine .modal { padding: 18px 16px; }
   #app-routine .modal .time-row .field { flex-basis: 100%; }
 }
 #app-routine .modal h2 { font-size: 15px; font-weight: 600; margin: 0 0 14px; }
@@ -1212,9 +1212,10 @@
 #app-routine .modal label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 4px; }
 #app-routine .modal input[type="time"], #app-routine .modal textarea {
     width: 100%;
+    box-sizing: border-box;
     border: 1px solid var(--line);
     border-radius: 6px;
-    padding: 6px 8px;
+    padding: 8px 10px;
     font-size: 13px;
     font-family: inherit;
     color: var(--ink);
@@ -2368,11 +2369,11 @@
         </div>
         <div style="flex:1; min-width:130px;"><label>보관 위치</label><select id="itemSlot"></select></div>
       </div>
-      <div class="row">
+      <div class="row" style="margin-bottom:16px;">
         <div style="min-width:150px;"><label>소비기한</label><input type="date" id="itemExpire"></div>
         <div style="flex:1.6; min-width:200px;"><label>용도 (어떤 요리?)</label><input type="text" id="itemPurpose" placeholder="예: 그릭요거트"></div>
       </div>
-      <div style="display:flex;gap:6px;">
+      <div style="display:flex;gap:6px; margin-top:4px;">
         <button class="action" id="itemSubmitBtn" onclick="submitItem()">+ 냉장고에 넣기</button>
         <button class="action cancel" id="itemCancelBtn" onclick="cancelItemEdit()" style="display:none;">취소</button>
       </div>
@@ -7406,6 +7407,7 @@ init();
       document.querySelectorAll('.app-panel').forEach(p=>p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.target).classList.add('active');
+      document.querySelectorAll('.export-modal-overlay.open').forEach(ov=>ov.classList.remove('open'));
       requestAnimationFrame(()=>{
         window.dispatchEvent(new Event('resize'));
       });
@@ -7422,6 +7424,7 @@ function toISO(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getD
 function fromISO(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function addDays(d,n){ const nd=new Date(d); nd.setDate(nd.getDate()+n); return nd; }
 const fmt = n => (Math.round(n*100)/100).toFixed(2);
+function escapeHtml(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function dietShrinkToFit(el, basePx, minPx){
   if(!el) return;
@@ -7908,31 +7911,56 @@ function useFav(i){
   document.getElementById('cal').value = f.cal;
   document.getElementById('favModal').classList.remove('open');
 }
-function editFav(i){
-  const f = favs[i];
-  const name = prompt('음식 이름', f.name); if(name===null) return;
-  const cal = prompt('칼로리(kcal)', f.cal); if(cal===null) return;
-  const carb = prompt('탄수화물(g), 없으면 빈칸', f.carb||''); if(carb===null) return;
-  const protein = prompt('단백질(g), 없으면 빈칸', f.protein||''); if(protein===null) return;
-  const fat = prompt('지방(g), 없으면 빈칸', f.fat||''); if(fat===null) return;
-  favs[i] = {name:name.trim()||f.name, cal:parseFloat(cal)||0, carb:parseFloat(carb)||0, protein:parseFloat(protein)||0, fat:parseFloat(fat)||0, sodium:f.sodium||0};
-  saveFavs(); renderFavPanel();
+let favEditIdx = null;
+function editFav(i){ favEditIdx = i; renderFavPanel(); }
+function cancelFavEdit(){ favEditIdx = null; renderFavPanel(); }
+function saveFavEdit(i){
+  const row = document.querySelector(`[data-fav-row="${i}"]`);
+  if(!row) return;
+  const name = row.querySelector('[data-favfield="name"]').textContent.trim();
+  const cal = parseFloat(row.querySelector('[data-favfield="cal"]').textContent) || 0;
+  const carb = parseFloat(row.querySelector('[data-favfield="carb"]').textContent) || 0;
+  const protein = parseFloat(row.querySelector('[data-favfield="protein"]').textContent) || 0;
+  const fat = parseFloat(row.querySelector('[data-favfield="fat"]').textContent) || 0;
+  if(!name){ alert('음식 이름을 입력해주세요'); return; }
+  favs[i] = {...favs[i], name, cal, carb, protein, fat};
+  saveFavs(); favEditIdx = null; renderFavPanel();
 }
 function removeFav(i){ favs.splice(i,1); saveFavs(); renderFavPanel(); }
 function renderFavPanel(){
   const box = document.getElementById('favListInner');
   if(favs.length===0){ box.innerHTML = '<div class="fav-empty">저장된 즐겨찾기가 없어요</div>'; return; }
-  box.innerHTML = favs.map((f,i)=>`
+  box.innerHTML = favs.map((f,i)=>{
+    if(favEditIdx===i){
+      return `
+      <div class="fav-row" data-fav-row="${i}">
+        <div class="fav-info" style="display:flex; flex-direction:column; gap:4px;">
+          <span class="etext" data-favfield="name" contenteditable="true" style="display:block; font-weight:700;">${escapeHtml(f.name)}</span>
+          <div style="display:flex; gap:8px; font-size:12px; flex-wrap:wrap;">
+            <span>탄 <span class="etext" data-favfield="carb" contenteditable="true">${f.carb||0}</span></span>
+            <span>단 <span class="etext" data-favfield="protein" contenteditable="true">${f.protein||0}</span></span>
+            <span>지 <span class="etext" data-favfield="fat" contenteditable="true">${f.fat||0}</span></span>
+            <span>kcal <span class="etext" data-favfield="cal" contenteditable="true">${f.cal||0}</span></span>
+          </div>
+        </div>
+        <div class="fav-actions">
+          <button class="icon-btn edit" onclick="saveFavEdit(${i})" title="저장">✓</button>
+          <button class="icon-btn del" onclick="cancelFavEdit()" title="취소">✕</button>
+        </div>
+      </div>`;
+    }
+    return `
     <div class="fav-row">
       <div class="fav-info" onclick="useFav(${i})">
-        <div class="fav-name">⭐ ${f.name}</div>
+        <div class="fav-name">⭐ ${escapeHtml(f.name)}</div>
         <div class="fav-macro">탄${fmt(f.carb)} 단${fmt(f.protein)} 지${fmt(f.fat)} · ${fmt(f.cal)}kcal</div>
       </div>
       <div class="fav-actions">
         <button class="icon-btn edit" onclick="editFav(${i})" title="수정">✎</button>
         <button class="icon-btn del" onclick="removeFav(${i})" title="삭제">✕</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function pickZone(z, keepSlot){
@@ -8285,6 +8313,8 @@ window.toggleFavPanel = toggleFavPanel;
 window.useFav = useFav;
 window.editFav = editFav;
 window.removeFav = removeFav;
+window.saveFavEdit = saveFavEdit;
+window.cancelFavEdit = cancelFavEdit;
 window.pickZone = pickZone;
 window.submitItem = submitItem;
 window.cancelItemEdit = cancelItemEdit;
