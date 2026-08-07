@@ -4,6 +4,63 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>My Planner</title>
+<style>
+  #exportPrintArea { display:none; }
+  @media print {
+    body * { visibility:hidden; }
+    #exportPrintArea, #exportPrintArea * { visibility:visible; }
+    #exportPrintArea { display:block !important; position:absolute; left:0; top:0; width:100%; margin:0; padding:0; }
+    .export-page { page-break-after:always; padding:24px; font-family:'Pretendard',sans-serif; box-sizing:border-box; }
+    .export-page:last-child { page-break-after:auto; }
+  }
+  .export-title { font-size:20px; font-weight:800; margin-bottom:4px; color:#1a1f2e; }
+  .export-sub { font-size:12px; color:#8890a0; margin-bottom:16px; }
+  .export-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .export-table th, .export-table td { border:1px solid #ddd; padding:6px 8px; text-align:left; vertical-align:top; }
+  .export-table th { background:#f3f1ea; font-weight:700; }
+  .export-cat-row td { background:#f8f7f3; font-weight:800; }
+  .export-modal-overlay {
+    position:fixed; inset:0; background:rgba(24,24,27,0.5); z-index:300;
+    display:none; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;
+  }
+  .export-modal-overlay.open { display:flex; }
+  .export-modal-box {
+    background:#fff; border-radius:14px; padding:22px; width:100%; max-width:420px; max-height:88vh;
+    overflow-y:auto; box-sizing:border-box; box-shadow:0 12px 32px rgba(0,0,0,0.2); font-family:inherit;
+  }
+  .export-modal-box h3 { margin:0 0 14px; font-size:16px; display:flex; justify-content:space-between; align-items:center; color:#1a1f2e; }
+  .export-modal-box .modal-close { background:none; border:none; font-size:18px; cursor:pointer; color:#8890a0; }
+  .export-field-label { font-size:11.5px; color:#8890a0; font-weight:700; margin:10px 0 4px; }
+  .export-modal-box select, .export-modal-box input[type="date"] {
+    width:100%; height:38px; border:1px solid #ddd; border-radius:8px; padding:0 10px; font-size:13px; font-family:inherit; box-sizing:border-box;
+  }
+  .export-row2 { display:flex; gap:8px; }
+  .export-row2 > div { flex:1; min-width:0; }
+  .export-format-row { display:flex; gap:8px; margin:14px 0 6px; }
+  .export-format-btn {
+    flex:1; border:1.5px solid #ddd; background:#fff; border-radius:9px; padding:10px 8px;
+    cursor:pointer; font-size:13px; font-weight:700; color:#555; text-align:center;
+  }
+  .export-format-btn.active { border-color:#1c2a52; background:#eef0f7; color:#1c2a52; }
+  .export-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+  .export-btn-primary {
+    background:#1c2a52; color:#fff; border:none; border-radius:8px; padding:9px 18px; font-weight:700; font-size:13px; cursor:pointer;
+  }
+  .export-btn-cancel {
+    background:none; border:1px solid #ddd; border-radius:8px; padding:9px 18px; font-weight:700; font-size:13px; cursor:pointer; color:#555;
+  }
+  .export-weekpicker { border:1px solid #ddd; border-radius:10px; padding:10px; }
+  .export-weekpicker-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .export-weekpicker-head button { background:none; border:none; font-size:16px; cursor:pointer; color:#8890a0; padding:2px 8px; }
+  .export-weekpicker-dow { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:10px; color:#8890a0; margin-bottom:2px; }
+  .export-weekpicker-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .export-wp-cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:6px; color:#c3c8d4; }
+  .export-wp-cell.pickable { color:#1a1f2e; cursor:pointer; }
+  .export-wp-cell.pickable:hover { background:#eef0f7; }
+  .export-wp-cell.in-range { background:#eef0f7; color:#1a1f2e; }
+  .export-wp-cell.range-start, .export-wp-cell.range-end { background:#1c2a52; color:#fff; font-weight:800; }
+  .export-wp-hint { font-size:11px; color:#8890a0; margin-top:6px; }
+</style>
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <style>
@@ -502,21 +559,23 @@
     text-align:center; color:var(--muted); font-size:11.5px; margin-top:18px;
   }
 #app-planner .m-header {
-    display:flex; flex-direction:column; gap:4px; margin-bottom:10px;
+    display:flex; flex-direction:column; gap:0; margin-bottom:10px;
   }
 #app-planner .m-title-row {
-    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:nowrap;
   }
 #app-planner .m-title {
     font-size:clamp(15px,5.5vw,24px); font-weight:800; color:var(--navy); outline:none;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1 1 auto;
+    line-height:1.3; margin-top:2px;
   }
 #app-planner .m-title:focus {background:var(--grid-soft); border-radius:6px;}
 #app-planner .m-subrow {
     display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
   }
-#app-planner .m-navgroup { display:flex; align-items:center; gap:6px; }
-#app-planner .m-savegroup { display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
+#app-planner .m-navgroup { display:flex; align-items:center; gap:6px; margin-top:2px; }
+#app-planner .m-savegroup { position:relative; display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
+#app-planner .m-savegroup .save-status { position:absolute; top:100%; right:0; white-space:nowrap; }
 #app-planner .m-daycard {
     border:1px solid var(--grid); border-radius:10px; background:var(--card);
     margin-bottom:10px; overflow:hidden;
@@ -1699,6 +1758,7 @@
         <span class="subrange" id="subRange"></span>
         <button class="cal-navbtn header-navbtn" id="nextWeek" title="다음 주">›</button>
         <button class="navbtn" id="resetGearBtn" title="데이터 초기화" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+        <button class="navbtn" onclick="openWeeklyExportModal()" title="내보내기" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
         <div class="save-group">
           <button class="save-btn" id="saveBtn">저장</button>
           <span class="save-status" id="saveStatus"></span>
@@ -1756,6 +1816,7 @@
         <div class="m-savegroup">
           <div style="display:flex; align-items:center; gap:6px;">
             <button class="navbtn" id="mResetGearBtn" title="데이터 초기화" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+            <button class="navbtn" onclick="openWeeklyExportModal()" title="내보내기" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
             <button class="save-btn" id="mSaveBtn">저장</button>
           </div>
           <span class="save-status" id="mSaveStatus"></span>
@@ -1910,6 +1971,7 @@
     <button class="mp-navbtn" id="mpNextMonth" title="다음 달">›</button>
     <span class="mp-save-status" id="mpSaveStatus"></span>
     <button class="mp-navbtn m-reset-boxed" id="mpResetGearBtn" title="데이터 초기화" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+    <button class="mp-navbtn m-reset-boxed" onclick="openMonthlyExportModal()" title="내보내기" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
     <button class="mp-today-btn" id="mpTodayBtn" title="이번 달로 이동">오늘</button>
   </div>
 
@@ -2337,6 +2399,7 @@
       <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-bottom:10px;">
         <button class="cal-today-btn" onclick="calGoToday()">이번 달로</button>
         <button class="cal-today-btn" onclick="openDietResetModal()" title="기간 초기화" style="width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+        <button class="cal-today-btn" onclick="openDietExportModal()" title="내보내기" style="width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       </div>
       <div class="cal-dow-row" id="calDowRow"></div>
       <div class="cal-grid" id="dietCalGrid"></div>
@@ -4750,6 +4813,7 @@ function renderUpcomingEvents(){
     renderBigCalendarMobile();
   });
 
+  window.__weeklyHolidayName = holidayName;
   window.__weeklyPlannerAPI = {
     jumpToDate: async function(iso){
       const tabBtn = document.querySelector('#tabbar .tabbtn[data-target="app-planner"]');
@@ -8244,6 +8308,465 @@ window.openDietResetModal = openDietResetModal;
 window.closeDietResetModal = closeDietResetModal;
 window.confirmDietReset = confirmDietReset;
 
+})();
+</script>
+<div class="export-modal-overlay" id="weeklyExportOverlay" onclick="if(event.target===this) closeWeeklyExportModal()">
+  <div class="export-modal-box">
+    <h3>Weekly 내보내기 <button class="modal-close" onclick="closeWeeklyExportModal()">✕</button></h3>
+    <div class="export-field-label">기간 선택 (시작 월요일 → 종료 일요일)</div>
+    <div class="export-weekpicker">
+      <div class="export-weekpicker-head">
+        <button onclick="wpShiftMonth(-1)">‹</button>
+        <span id="wpMonthLabel" style="font-weight:700; font-size:13px;"></span>
+        <button onclick="wpShiftMonth(1)">›</button>
+      </div>
+      <div class="export-weekpicker-dow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+      <div class="export-weekpicker-grid" id="wpGrid"></div>
+      <div class="export-wp-hint" id="wpHint">시작할 월요일을 선택해주세요</div>
+    </div>
+    <div class="export-format-row">
+      <button class="export-format-btn active" id="weeklyFmtPdf" onclick="setWeeklyFormat('pdf')">📄 PDF</button>
+      <button class="export-format-btn" id="weeklyFmtJson" onclick="setWeeklyFormat('json')">🗂 JSON</button>
+    </div>
+    <div class="export-actions">
+      <button class="export-btn-cancel" onclick="closeWeeklyExportModal()">취소</button>
+      <button class="export-btn-primary" id="weeklyExportOkBtn" onclick="runWeeklyExport()">내보내기</button>
+    </div>
+  </div>
+</div>
+
+<div class="export-modal-overlay" id="monthlyExportOverlay" onclick="if(event.target===this) closeMonthlyExportModal()">
+  <div class="export-modal-box">
+    <h3>Monthly 내보내기 <button class="modal-close" onclick="closeMonthlyExportModal()">✕</button></h3>
+    <div class="export-field-label">기간 선택</div>
+    <div class="export-field-label" style="margin-top:0;">시작</div>
+    <div class="export-row2">
+      <select id="mpExportStartYearSel"></select>
+      <select id="mpExportStartMonthSel"></select>
+    </div>
+    <div class="export-field-label">종료</div>
+    <div class="export-row2">
+      <select id="mpExportEndYearSel"></select>
+      <select id="mpExportEndMonthSel"></select>
+    </div>
+    <div class="export-format-row">
+      <button class="export-format-btn active" id="monthlyFmtPdf" onclick="setMonthlyFormat('pdf')">📄 PDF</button>
+      <button class="export-format-btn" id="monthlyFmtJson" onclick="setMonthlyFormat('json')">🗂 JSON</button>
+    </div>
+    <div class="export-actions">
+      <button class="export-btn-cancel" onclick="closeMonthlyExportModal()">취소</button>
+      <button class="export-btn-primary" id="monthlyExportOkBtn" onclick="runMonthlyExport()">내보내기</button>
+    </div>
+  </div>
+</div>
+
+<div class="export-modal-overlay" id="dietExportOverlay" onclick="if(event.target===this) closeDietExportModal()">
+  <div class="export-modal-box">
+    <h3>DIET 캘린더 내보내기 <button class="modal-close" onclick="closeDietExportModal()">✕</button></h3>
+    <div class="export-field-label">기간 선택</div>
+    <div class="export-field-label" style="margin-top:0;">시작</div>
+    <div class="export-row2">
+      <select id="dietExportStartYearSel"></select>
+      <select id="dietExportStartMonthSel"></select>
+    </div>
+    <div class="export-field-label">종료</div>
+    <div class="export-row2">
+      <select id="dietExportEndYearSel"></select>
+      <select id="dietExportEndMonthSel"></select>
+    </div>
+    <div class="export-format-row">
+      <button class="export-format-btn active" id="dietFmtPdf" onclick="setDietFormat('pdf')">📄 PDF</button>
+      <button class="export-format-btn" id="dietFmtJson" onclick="setDietFormat('json')">🗂 JSON</button>
+    </div>
+    <div class="export-actions">
+      <button class="export-btn-cancel" onclick="closeDietExportModal()">취소</button>
+      <button class="export-btn-primary" id="dietExportOkBtn" onclick="runDietExport()">내보내기</button>
+    </div>
+  </div>
+</div>
+
+<div id="exportPrintArea"></div>
+
+<script>
+(function(){
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function toISO(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function fromISO(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+  function addDays(d,n){ const nd=new Date(d); nd.setDate(nd.getDate()+n); return nd; }
+  function escapeHtml(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  async function sGet(key){
+    try{ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }catch(e){ return null; }
+  }
+  async function sList(prefix){
+    try{ const r = await window.storage.list(prefix, false); return (r && r.keys) ? r.keys : []; }catch(e){ return []; }
+  }
+  function triggerPrint(innerHtml){
+    document.getElementById('exportPrintArea').innerHTML = innerHtml;
+    setTimeout(()=>{ window.print(); }, 80);
+  }
+  function downloadJson(obj, filename){
+    const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+  function monthLabel(y,m){ return y+'년 '+(m+1)+'월'; }
+
+  /* ============ WEEKLY 내보내기 ============ */
+  let weeklyFormat = 'pdf';
+  let wpViewMonth = new Date();
+  let wpRangeStart = null, wpRangeEnd = null;
+
+  window.openWeeklyExportModal = function(){
+    weeklyFormat = 'pdf';
+    document.getElementById('weeklyFmtPdf').classList.add('active');
+    document.getElementById('weeklyFmtJson').classList.remove('active');
+    wpViewMonth = new Date();
+    wpRangeStart = null; wpRangeEnd = null;
+    renderWeekPicker();
+    document.getElementById('weeklyExportOverlay').classList.add('open');
+  };
+  window.closeWeeklyExportModal = function(){
+    document.getElementById('weeklyExportOverlay').classList.remove('open');
+  };
+  window.wpShiftMonth = function(delta){
+    wpViewMonth = new Date(wpViewMonth.getFullYear(), wpViewMonth.getMonth()+delta, 1);
+    renderWeekPicker();
+  };
+  window.setWeeklyFormat = function(fmt){
+    weeklyFormat = fmt;
+    document.getElementById('weeklyFmtPdf').classList.toggle('active', fmt==='pdf');
+    document.getElementById('weeklyFmtJson').classList.toggle('active', fmt==='json');
+  };
+
+  function getMonday(d){
+    const nd = new Date(d);
+    const day = nd.getDay();
+    const diff = day===0 ? -6 : 1-day;
+    nd.setDate(nd.getDate()+diff);
+    return nd;
+  }
+
+  function renderWeekPicker(){
+    const y = wpViewMonth.getFullYear(), m = wpViewMonth.getMonth();
+    document.getElementById('wpMonthLabel').textContent = monthLabel(y,m);
+    const first = new Date(y,m,1);
+    const startOffset = first.getDay();
+    const total = new Date(y,m+1,0).getDate();
+    const gridEl = document.getElementById('wpGrid');
+    let html = '';
+    const cellStart = addDays(first, -startOffset);
+    for(let i=0;i<42;i++){
+      const d = addDays(cellStart, i);
+      const iso = toISO(d);
+      const inMonth = d.getMonth()===m;
+      const isMon = d.getDay()===1;
+      const isSun = d.getDay()===0;
+      const hol = (isMon && window.__weeklyHolidayName) ? window.__weeklyHolidayName(iso) : '';
+      let pickable = false;
+      if(!wpRangeStart) pickable = isMon;
+      else if(wpRangeStart && !wpRangeEnd) pickable = isSun && iso >= wpRangeStart;
+      else pickable = isMon; // 완료된 뒤엔 월요일 눌러서 다시 시작 가능
+
+      let cls = 'export-wp-cell';
+      if(pickable) cls += ' pickable';
+      if(iso===wpRangeStart) cls += ' range-start';
+      if(iso===wpRangeEnd) cls += ' range-end';
+      if(wpRangeStart && wpRangeEnd && iso>wpRangeStart && iso<wpRangeEnd) cls += ' in-range';
+      const isRangeEdge = (iso===wpRangeStart || iso===wpRangeEnd);
+      const holColor = hol && !isRangeEdge ? 'color:#e0483f;' : '';
+      const opacity = inMonth ? '' : 'opacity:0.35;';
+      html += `<div class="${cls}" style="${opacity}${holColor}" title="${hol?hol:''}" ${pickable?`onclick="wpPick('${iso}')"`:''}>${d.getDate()}</div>`;
+    }
+    gridEl.innerHTML = html;
+    const hintEl = document.getElementById('wpHint');
+    if(!wpRangeStart) hintEl.textContent = '시작할 월요일을 선택해주세요';
+    else if(!wpRangeEnd) hintEl.textContent = `시작: ${wpRangeStart} · 종료할 일요일을 선택해주세요`;
+    else hintEl.textContent = `${wpRangeStart} ~ ${wpRangeEnd} 선택됨 (다시 고르려면 새 월요일을 눌러주세요)`;
+  }
+  window.wpPick = function(iso){
+    const d = fromISO(iso);
+    if(!wpRangeStart){
+      wpRangeStart = iso; wpRangeEnd = null;
+    } else if(!wpRangeEnd){
+      wpRangeEnd = iso;
+    } else {
+      wpRangeStart = iso; wpRangeEnd = null;
+    }
+    renderWeekPicker();
+  };
+
+  const STATUS_LABEL_EXPORT = {'':'', 'O':'O', 'X':'X', 'ARROW':'→'};
+  function buildWeeklyExportPage(mondayISO, data){
+    const monday = fromISO(mondayISO);
+    const sunday = addDays(monday,6);
+    let rows = '';
+    const cats = (data && data.categories) || [];
+    if(cats.length===0){
+      rows = `<tr><td colspan="6" style="color:#999;">저장된 내용이 없어요</td></tr>`;
+    }
+    cats.forEach(cat=>{
+      rows += `<tr class="export-cat-row"><td colspan="6">${escapeHtml(cat.name||'(이름없음)')}</td></tr>`;
+      (cat.items||[]).forEach(item=>{
+        let cells = '';
+        for(let d=0; d<5; d++){
+          const cell = (data.cells||{})[item.id+'_'+d] || {status:'',note:''};
+          const label = STATUS_LABEL_EXPORT[cell.status] || '';
+          cells += `<td>${label}${cell.note?('<br><span style="color:#888;font-size:10px;">'+escapeHtml(cell.note)+'</span>'):''}</td>`;
+        }
+        cells = cells || '<td></td><td></td><td></td><td></td><td></td>';
+        rows += `<tr><td>${escapeHtml(item.text||'')}</td>${cells}</tr>`;
+      });
+    });
+    const dayHeads = [0,1,2,3,4].map(i=>{
+      const d = addDays(monday,i);
+      return `${d.getMonth()+1}/${d.getDate()}`;
+    });
+    return `<div class="export-page">
+      <div class="export-title">${escapeHtml((data&&data.title) || 'Weekly')}</div>
+      <div class="export-sub">${mondayISO} ~ ${toISO(sunday)}</div>
+      <table class="export-table">
+        <thead><tr><th style="width:26%;">항목</th>${dayHeads.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
+  window.runWeeklyExport = async function(){
+    const btn = document.getElementById('weeklyExportOkBtn');
+    if(weeklyFormat === 'json'){
+      btn.disabled = true; btn.textContent = '내보내는 중...';
+      const keys = await sList('week:');
+      const out = {};
+      for(const k of keys){ out[k] = await sGet(k); }
+      downloadJson({ type:'weekly-full-backup', exportedAt: new Date().toISOString(), data: out }, 'weekly-backup.json');
+      btn.disabled = false; btn.textContent = '내보내기';
+      closeWeeklyExportModal();
+      return;
+    }
+    if(!wpRangeStart || !wpRangeEnd){ alert('시작 월요일과 종료 일요일을 선택해주세요'); return; }
+    btn.disabled = true; btn.textContent = '만드는 중...';
+    let pages = '';
+    let cur = fromISO(wpRangeStart);
+    const end = fromISO(wpRangeEnd);
+    while(toISO(cur) <= toISO(end)){
+      const mondayISO = toISO(cur);
+      const data = await sGet('week:'+mondayISO);
+      pages += buildWeeklyExportPage(mondayISO, data || {categories:[], cells:{}, title:''});
+      cur = addDays(cur, 7);
+    }
+    btn.disabled = false; btn.textContent = '내보내기';
+    closeWeeklyExportModal();
+    triggerPrint(pages);
+  };
+
+  /* ============ MONTHLY 내보내기 ============ */
+  let monthlyFormat = 'pdf';
+  function populateYearMonthSelects(yearSel, monthSel, defaultDate){
+    const curYear = defaultDate.getFullYear();
+    let yHtml = '';
+    for(let y=curYear-5; y<=curYear+5; y++){
+      yHtml += `<option value="${y}" ${y===curYear?'selected':''}>${y}년</option>`;
+    }
+    yearSel.innerHTML = yHtml;
+    let mHtml = '';
+    for(let m=1; m<=12; m++){
+      mHtml += `<option value="${m}" ${m===defaultDate.getMonth()+1?'selected':''}>${m}월</option>`;
+    }
+    monthSel.innerHTML = mHtml;
+  }
+  window.openMonthlyExportModal = function(){
+    monthlyFormat = 'pdf';
+    document.getElementById('monthlyFmtPdf').classList.add('active');
+    document.getElementById('monthlyFmtJson').classList.remove('active');
+    const now = new Date();
+    populateYearMonthSelects(document.getElementById('mpExportStartYearSel'), document.getElementById('mpExportStartMonthSel'), now);
+    populateYearMonthSelects(document.getElementById('mpExportEndYearSel'), document.getElementById('mpExportEndMonthSel'), now);
+    document.getElementById('monthlyExportOverlay').classList.add('open');
+  };
+  window.closeMonthlyExportModal = function(){
+    document.getElementById('monthlyExportOverlay').classList.remove('open');
+  };
+  window.setMonthlyFormat = function(fmt){
+    monthlyFormat = fmt;
+    document.getElementById('monthlyFmtPdf').classList.toggle('active', fmt==='pdf');
+    document.getElementById('monthlyFmtJson').classList.toggle('active', fmt==='json');
+  };
+
+  async function buildMonthlyExportPage(year, month){
+    const first = new Date(year, month, 1);
+    const startOffset = first.getDay();
+    const total = new Date(year, month+1, 0).getDate();
+    const eventsRes = await sGet('events');
+    const events = Array.isArray(eventsRes) ? eventsRes : [];
+    const monthKey = year+'-'+(month+1); // habit-config/marks 키는 패딩 없음
+    const habitCfg = await sGet('habit-config:'+monthKey);
+    const habitMarks = await sGet('habit-marks:'+monthKey) || {};
+    const habitNames = (habitCfg && habitCfg.names) || [];
+
+    let cellsHtml = '';
+    for(let i=0;i<startOffset;i++) cellsHtml += `<td></td>`;
+    let col = startOffset;
+    for(let day=1; day<=total; day++){
+      const dISO = year+'-'+pad(month+1)+'-'+pad(day);
+      const dayEvents = events.filter(ev=> ev.start<=dISO && dISO<=ev.end);
+      const evText = dayEvents.slice(0,3).map(ev=>escapeHtml(ev.title)).join(', ');
+      cellsHtml += `<td style="vertical-align:top; height:52px;"><div style="font-weight:700;">${day}</div><div style="font-size:9px; color:#555;">${evText}</div></td>`;
+      col++;
+      if(col===7){ cellsHtml += '</tr><tr>'; col=0; }
+    }
+    for(;col<7 && col!==0;col++) cellsHtml += `<td></td>`;
+
+    let habitRows = '';
+    if(habitNames.some(n=>n)){
+      habitRows += `<table class="export-table" style="margin-top:14px;"><thead><tr><th>습관</th>${Array.from({length:total},(_,i)=>`<th style="padding:2px;">${i+1}</th>`).join('')}</tr></thead><tbody>`;
+      habitNames.forEach((name, idx)=>{
+        if(!name) return;
+        let row = `<tr><td>${escapeHtml(name)}</td>`;
+        for(let day=1; day<=total; day++){
+          const marks = habitMarks[day] || [];
+          row += `<td style="text-align:center;">${marks[idx]?'●':''}</td>`;
+        }
+        row += '</tr>';
+        habitRows += row;
+      });
+      habitRows += '</tbody></table>';
+    }
+
+    return `<div class="export-page">
+      <div class="export-title">${monthLabel(year,month)}</div>
+      <table class="export-table">
+        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+        <tbody><tr>${cellsHtml}</tr></tbody>
+      </table>
+      ${habitRows}
+    </div>`;
+  }
+
+  window.runMonthlyExport = async function(){
+    const btn = document.getElementById('monthlyExportOkBtn');
+    if(monthlyFormat === 'json'){
+      btn.disabled = true; btn.textContent = '내보내는 중...';
+      const monthKeys = await sList('month:');
+      const habitCfgKeys = await sList('habit-config:');
+      const habitMarkKeys = await sList('habit-marks:');
+      const eventsData = await sGet('events');
+      const out = { events: eventsData, months:{}, habitConfigs:{}, habitMarks:{} };
+      for(const k of monthKeys) out.months[k] = await sGet(k);
+      for(const k of habitCfgKeys) out.habitConfigs[k] = await sGet(k);
+      for(const k of habitMarkKeys) out.habitMarks[k] = await sGet(k);
+      downloadJson({ type:'monthly-full-backup', exportedAt: new Date().toISOString(), data: out }, 'monthly-backup.json');
+      btn.disabled = false; btn.textContent = '내보내기';
+      closeMonthlyExportModal();
+      return;
+    }
+    const sy = +document.getElementById('mpExportStartYearSel').value;
+    const sm = +document.getElementById('mpExportStartMonthSel').value;
+    const ey = +document.getElementById('mpExportEndYearSel').value;
+    const em = +document.getElementById('mpExportEndMonthSel').value;
+    let startIdx = sy*12+(sm-1), endIdx = ey*12+(em-1);
+    if(startIdx > endIdx){ const t=startIdx; startIdx=endIdx; endIdx=t; }
+    btn.disabled = true; btn.textContent = '만드는 중...';
+    let pages = '';
+    for(let idx=startIdx; idx<=endIdx; idx++){
+      const y = Math.floor(idx/12), m = idx%12;
+      pages += await buildMonthlyExportPage(y, m);
+    }
+    btn.disabled = false; btn.textContent = '내보내기';
+    closeMonthlyExportModal();
+    triggerPrint(pages);
+  };
+
+  /* ============ DIET 캘린더 내보내기 ============ */
+  let dietFormat = 'pdf';
+  window.openDietExportModal = function(){
+    dietFormat = 'pdf';
+    document.getElementById('dietFmtPdf').classList.add('active');
+    document.getElementById('dietFmtJson').classList.remove('active');
+    const now = new Date();
+    populateYearMonthSelects(document.getElementById('dietExportStartYearSel'), document.getElementById('dietExportStartMonthSel'), now);
+    populateYearMonthSelects(document.getElementById('dietExportEndYearSel'), document.getElementById('dietExportEndMonthSel'), now);
+    document.getElementById('dietExportOverlay').classList.add('open');
+  };
+  window.closeDietExportModal = function(){
+    document.getElementById('dietExportOverlay').classList.remove('open');
+  };
+  window.setDietFormat = function(fmt){
+    dietFormat = fmt;
+    document.getElementById('dietFmtPdf').classList.toggle('active', fmt==='pdf');
+    document.getElementById('dietFmtJson').classList.toggle('active', fmt==='json');
+  };
+
+  async function buildDietExportPage(year, month){
+    const first = new Date(year, month, 1);
+    const startOffset = first.getDay();
+    const total = new Date(year, month+1, 0).getDate();
+    const keys = await sList('diet:day:'+year+'-'+pad(month+1)+'-');
+    const dayMap = {};
+    if(keys.length){
+      const results = await Promise.all(keys.map(k=>sGet(k)));
+      keys.forEach((k, idx)=>{
+        const d = results[idx];
+        if(!d) return;
+        const dISO = k.slice(9);
+        const foods = d.foods || [];
+        const kcal = foods.reduce((a,f)=>a+f.cal,0);
+        dayMap[dISO] = { weight: d.weight||'', kcal };
+      });
+    }
+    let cellsHtml = '';
+    for(let i=0;i<startOffset;i++) cellsHtml += `<td></td>`;
+    let col = startOffset;
+    for(let day=1; day<=total; day++){
+      const dISO = year+'-'+pad(month+1)+'-'+pad(day);
+      const info = dayMap[dISO];
+      const inner = info ? `${info.weight?escapeHtml(info.weight)+'kg':''}${info.kcal?'<br>'+Math.round(info.kcal)+'kcal':''}` : '';
+      cellsHtml += `<td style="vertical-align:top; height:50px;"><div style="font-weight:700;">${day}</div><div style="font-size:9px; color:#555;">${inner}</div></td>`;
+      col++;
+      if(col===7){ cellsHtml += '</tr><tr>'; col=0; }
+    }
+    return `<div class="export-page">
+      <div class="export-title">${monthLabel(year,month)} · DIET</div>
+      <table class="export-table">
+        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+        <tbody><tr>${cellsHtml}</tr></tbody>
+      </table>
+    </div>`;
+  }
+
+  window.runDietExport = async function(){
+    const btn = document.getElementById('dietExportOkBtn');
+    if(dietFormat === 'json'){
+      btn.disabled = true; btn.textContent = '내보내는 중...';
+      const dayKeys = await sList('diet:day:');
+      const fridgeData = await sGet('fridge');
+      const favsData = await sGet('favs');
+      const out = { days:{}, fridge: fridgeData, favs: favsData };
+      const results = await Promise.all(dayKeys.map(k=>sGet(k)));
+      dayKeys.forEach((k,idx)=>{ out.days[k] = results[idx]; });
+      downloadJson({ type:'diet-full-backup', exportedAt: new Date().toISOString(), data: out }, 'diet-backup.json');
+      btn.disabled = false; btn.textContent = '내보내기';
+      closeDietExportModal();
+      return;
+    }
+    const sy = +document.getElementById('dietExportStartYearSel').value;
+    const sm = +document.getElementById('dietExportStartMonthSel').value;
+    const ey = +document.getElementById('dietExportEndYearSel').value;
+    const em = +document.getElementById('dietExportEndMonthSel').value;
+    let startIdx = sy*12+(sm-1), endIdx = ey*12+(em-1);
+    if(startIdx > endIdx){ const t=startIdx; startIdx=endIdx; endIdx=t; }
+    btn.disabled = true; btn.textContent = '만드는 중...';
+    let pages = '';
+    for(let idx=startIdx; idx<=endIdx; idx++){
+      const y = Math.floor(idx/12), m = idx%12;
+      pages += await buildDietExportPage(y, m);
+    }
+    btn.disabled = false; btn.textContent = '내보내기';
+    closeDietExportModal();
+    triggerPrint(pages);
+  };
 })();
 </script>
 </body>
