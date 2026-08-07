@@ -612,7 +612,7 @@
 #app-planner .m-upcoming-body { flex:1; min-width:0; }
 #app-planner .m-upcoming-item-title { font-weight:700; font-size:11.5px; color:#1a1f2e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #app-planner .m-upcoming-item-date { font-size:9.5px; color:var(--muted); margin-top:1px; }
-#app-planner .m-upcoming-item-dday { font-size:9.5px; color:var(--muted); font-weight:700; margin-top:1px; }
+#app-planner .m-upcoming-dday { font-weight:700; color:var(--muted); }
 #app-planner .m-upcoming-empty { font-size:11px; color:var(--muted); padding:4px 2px; }
 #app-planner .m-bigcal-head {
     display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;
@@ -4067,8 +4067,8 @@ function renderUpcomingEvents(){
     calUpcomingListEl.innerHTML = upcoming.map(ev=>{
       const s = fromISO(ev.start), e = fromISO(ev.end);
       const rangeText = ev.start===ev.end
-        ? `${s.getMonth()+1}/${s.getDate()}`
-        : `${s.getMonth()+1}/${s.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}`;
+        ? `${s.getMonth()+1}/${s.getDate()}(${DOW_KO[s.getDay()]})`
+        : `${s.getMonth()+1}/${s.getDate()}(${DOW_KO[s.getDay()]}) ~ ${e.getMonth()+1}/${e.getDate()}(${DOW_KO[e.getDay()]})`;
       return `<div class="cal-upcoming-item" data-action="upcoming-jump" data-iso="${ev.start}" data-id="${ev.id}">
         <div class="u-main">
           <div class="u-title" style="color:${ev.color || 'inherit'};">${escapeHtml(ev.title)}</div>
@@ -4376,8 +4376,11 @@ function renderUpcomingEvents(){
       return;
     }
     listEl.innerHTML = upcoming.map(ev=>{
-      const s = fromISO(ev.start);
-      const dateText = `${s.getMonth()+1}/${s.getDate()} ${DOW_KO[s.getDay()]}${ev.dday ? ' ' + ddayLabel(ev) : ''}`;
+      const s = fromISO(ev.start), e = fromISO(ev.end);
+      const rangeText = ev.start===ev.end
+        ? `${s.getMonth()+1}/${s.getDate()}(${DOW_KO[s.getDay()]})`
+        : `${s.getMonth()+1}/${s.getDate()}(${DOW_KO[s.getDay()]}) ~ ${e.getMonth()+1}/${e.getDate()}(${DOW_KO[e.getDay()]})`;
+      const dateText = rangeText + (ev.dday ? ' · <span class="m-upcoming-dday">'+ddayLabel(ev)+'</span>' : '');
       return `<div class="m-upcoming-item" data-iso="${ev.start}" data-id="${ev.id}">
         <div class="m-upcoming-bar" style="background:${ev.color || 'var(--navy)'};"></div>
         <div class="m-upcoming-body" data-action="m-upcoming-jump" data-iso="${ev.start}">
