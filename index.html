@@ -257,7 +257,7 @@
     display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
   }
 #app-planner .confirm-box {
-    background:#fff; border-radius:12px; padding:20px 20px 16px; max-width:320px; width:100%;
+    background:#fff; border-radius:12px; padding:22px 24px 18px; max-width:320px; width:100%;
     box-shadow:0 12px 32px rgba(20,25,45,0.25); box-sizing:border-box; overflow-x:hidden;
   }
 #app-planner .confirm-msg { font-size:13.5px; color:#1a1f2e; line-height:1.6; white-space:pre-line; margin-bottom:16px; }
@@ -280,7 +280,7 @@
     box-sizing:border-box;
   }
 #app-planner .event-input:focus { border-color:var(--navy); }
-#app-planner .event-date-row { display:flex; gap:8px; }
+#app-planner .event-date-row { display:flex; gap:14px; }
 #app-planner .event-date-col { flex:1; min-width:0; }
 #app-planner .event-color-row { display:flex; gap:7px; margin-bottom:4px; }
 #app-planner .event-color-swatch {
@@ -1195,7 +1195,7 @@
 #app-routine .modal {
     background: #fff;
     border-radius: 10px;
-    padding: 20px 22px;
+    padding: 24px 26px;
     width: 320px;
     max-width: 100%;
     box-sizing: border-box;
@@ -1213,12 +1213,13 @@
 #app-routine .modal input[type="time"], #app-routine .modal textarea {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid var(--line);
+    border: 1.5px solid var(--line);
     border-radius: 6px;
     padding: 8px 10px;
     font-size: 13px;
     font-family: inherit;
     color: var(--ink);
+    background: #fafafa;
   }
 #app-routine .modal textarea { resize: vertical; min-height: 60px; }
 #app-routine .modal .time-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -2370,7 +2371,7 @@
         <div style="flex:1; min-width:130px;"><label>보관 위치</label><select id="itemSlot"></select></div>
       </div>
       <div class="row" style="margin-bottom:16px;">
-        <div style="min-width:150px;"><label>소비기한</label><input type="date" id="itemExpire"></div>
+        <div style="flex:1; min-width:150px;"><label>소비기한</label><input type="date" id="itemExpire"></div>
         <div style="flex:1.6; min-width:200px;"><label>용도 (어떤 요리?)</label><input type="text" id="itemPurpose" placeholder="예: 그릭요거트"></div>
       </div>
       <div style="display:flex;gap:6px; margin-top:4px;">
