@@ -6686,6 +6686,8 @@ const CATEGORY_TEMPLATE = [
   ]},
 ];
 
+window.__moneyCategoryTemplate = CATEGORY_TEMPLATE;
+
 let template = null;   // {catId:{childId:{name,budget,note}}} flattened editable budgets, loaded from storage or default
 let monthData = { salary: 0, expenses: {} }; // expenses: {leafId: [{id,date,memo,amount}]}
 let currentMonth = '';
@@ -7221,23 +7223,7 @@ function bindEvents(){
     await switchToMonth(e.target.value);
   });
 
-  document.getElementById('exportBtn').addEventListener('click', async ()=>{
-    const keys = await window.storage.list('month:', false).catch(()=>null);
-    const allMonths = {};
-    if(keys && keys.keys){
-      for(const k of keys.keys){
-        const d = await storageGet(k);
-        allMonths[k] = d;
-      }
-    }
-    const backup = { template, months: allMonths };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'money-plan-backup.json'; a.click();
-    URL.revokeObjectURL(url);
-    toast('백업 파일을 내려받았어요');
-  });
+  document.getElementById('exportBtn').addEventListener('click', openMoneyExportModal);
 
   document.getElementById('moneyResetBtn').addEventListener('click', openMoneyResetModal);
   document.getElementById('buyListBtn').addEventListener('click', openBuyListModal);
@@ -8360,6 +8346,31 @@ window.confirmDietReset = confirmDietReset;
   </div>
 </div>
 
+<div class="export-modal-overlay" id="moneyExportOverlay" onclick="if(event.target===this) closeMoneyExportModal()">
+  <div class="export-modal-box">
+    <h3>Money Plan 내보내기 <button class="modal-close" onclick="closeMoneyExportModal()">✕</button></h3>
+    <div class="export-field-label">기간 선택 (매달 21일 ~ 다음달 20일 고정)</div>
+    <div class="export-field-label" style="margin-top:0;">시작 (21일부터)</div>
+    <div class="export-row2">
+      <select id="moneyExportStartYearSel"></select>
+      <select id="moneyExportStartMonthSel"></select>
+    </div>
+    <div class="export-field-label">종료 (다음달 20일까지)</div>
+    <div class="export-row2">
+      <select id="moneyExportEndYearSel"></select>
+      <select id="moneyExportEndMonthSel"></select>
+    </div>
+    <div class="export-format-row">
+      <button class="export-format-btn active" id="moneyFmtPdf" onclick="setMoneyFormat('pdf')">📄 PDF</button>
+      <button class="export-format-btn" id="moneyFmtJson" onclick="setMoneyFormat('json')">🗂 JSON</button>
+    </div>
+    <div class="export-actions">
+      <button class="export-btn-cancel" onclick="closeMoneyExportModal()">취소</button>
+      <button class="export-btn-primary" id="moneyExportOkBtn" onclick="runMoneyExport()">내보내기</button>
+    </div>
+  </div>
+</div>
+
 <div class="export-modal-overlay" id="dietExportOverlay" onclick="if(event.target===this) closeDietExportModal()">
   <div class="export-modal-box">
     <h3>DIET 캘린더 내보내기 <button class="modal-close" onclick="closeDietExportModal()">✕</button></h3>
@@ -8559,6 +8570,133 @@ window.confirmDietReset = confirmDietReset;
     }
     btn.disabled = false; btn.textContent = '내보내기';
     closeWeeklyExportModal();
+    triggerPrint(pages);
+  };
+
+  /* ============ MONEY PLAN 내보내기 (조회기간 21일~다음달 20일 기준) ============ */
+  const MONEY_PAYDAY = 21;
+  let moneyFormat = 'pdf';
+
+  function moneyPeriodKeyOf(d){
+    let year = d.getFullYear(), month = d.getMonth()+1;
+    if(d.getDate() < MONEY_PAYDAY){
+      month -= 1;
+      if(month===0){ month=12; year-=1; }
+    }
+    return year+'-'+pad(month);
+  }
+  function moneyPeriodLabel(key){
+    const [y,m] = key.split('-').map(Number);
+    let endY=y, endM=m+1;
+    if(endM===13){ endM=1; endY=y+1; }
+    return `${String(y).slice(-2)}년 ${m}/${MONEY_PAYDAY} ~ ${endM}/${MONEY_PAYDAY-1}`;
+  }
+  function populateMoneyPeriodSelects(){
+    const now = new Date();
+    const curKey = moneyPeriodKeyOf(now);
+    const [cy, cm] = curKey.split('-').map(Number);
+    let endY = cy, endM = cm + 1;
+    if(endM === 13){ endM = 1; endY += 1; }
+    populateYearMonthSelects2(document.getElementById('moneyExportStartYearSel'), document.getElementById('moneyExportStartMonthSel'), cy, cm);
+    populateYearMonthSelects2(document.getElementById('moneyExportEndYearSel'), document.getElementById('moneyExportEndMonthSel'), endY, endM);
+  }
+  function populateYearMonthSelects2(yearSel, monthSel, defYear, defMonth){
+    let yHtml = '';
+    for(let y=defYear-5; y<=defYear+5; y++){
+      yHtml += `<option value="${y}" ${y===defYear?'selected':''}>${y}년</option>`;
+    }
+    yearSel.innerHTML = yHtml;
+    let mHtml = '';
+    for(let m=1; m<=12; m++){
+      mHtml += `<option value="${m}" ${m===defMonth?'selected':''}>${m}월</option>`;
+    }
+    monthSel.innerHTML = mHtml;
+  }
+  window.openMoneyExportModal = function(){
+    moneyFormat = 'pdf';
+    document.getElementById('moneyFmtPdf').classList.add('active');
+    document.getElementById('moneyFmtJson').classList.remove('active');
+    populateMoneyPeriodSelects();
+    document.getElementById('moneyExportOverlay').classList.add('open');
+  };
+  window.closeMoneyExportModal = function(){
+    document.getElementById('moneyExportOverlay').classList.remove('open');
+  };
+  window.setMoneyFormat = function(fmt){
+    moneyFormat = fmt;
+    document.getElementById('moneyFmtPdf').classList.toggle('active', fmt==='pdf');
+    document.getElementById('moneyFmtJson').classList.toggle('active', fmt==='json');
+  };
+
+  async function buildMoneyExportPage(periodKey, catTemplate, tmpl){
+    const data = await sGet('month:'+periodKey) || { salary:0, expenses:{} };
+    const won = n => (Math.round(n)||0).toLocaleString('ko-KR')+'원';
+    function spentOf(leafId){
+      const list = (data.expenses && data.expenses[leafId]) || [];
+      return list.reduce((s,e)=>s+Number(e.amount||0), 0);
+    }
+    let totalBudget=0, totalSpent=0;
+    let rows = '';
+    catTemplate.forEach(cat=>{
+      rows += `<tr class="export-cat-row"><td colspan="3">${escapeHtml(cat.name)}</td></tr>`;
+      cat.children.forEach(ch=>{
+        const t = (tmpl && tmpl[cat.id] && tmpl[cat.id][ch.id]) || {};
+        const budget = (t.budget!==undefined ? t.budget : ch.budget) || 0;
+        const spent = spentOf(ch.id);
+        totalBudget += budget; totalSpent += spent;
+        rows += `<tr><td>${escapeHtml(t.name||ch.name)}</td><td style="text-align:right;">예산 ${won(budget)}</td><td style="text-align:right;">지출 ${won(spent)}</td></tr>`;
+      });
+    });
+    const salary = data.salary || 0;
+    const free = salary - totalSpent;
+    return `<div class="export-page">
+      <div class="export-title">Money Plan</div>
+      <div class="export-sub">${moneyPeriodLabel(periodKey)}</div>
+      <table class="export-table" style="margin-bottom:14px;">
+        <tbody>
+          <tr><td>이번 달 월급</td><td style="text-align:right;">${won(salary)}</td></tr>
+          <tr><td>실제 총 지출</td><td style="text-align:right;">${won(totalSpent)}</td></tr>
+          <tr><td>총 여유 비용</td><td style="text-align:right;">${won(free)}</td></tr>
+        </tbody>
+      </table>
+      <table class="export-table">
+        <thead><tr><th>항목</th><th>예산</th><th>지출</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
+  window.runMoneyExport = async function(){
+    const btn = document.getElementById('moneyExportOkBtn');
+    if(moneyFormat === 'json'){
+      btn.disabled = true; btn.textContent = '내보내는 중...';
+      const monthKeys = await sList('month:');
+      const tmpl = await sGet('category-template');
+      const buyList = await sGet('buylist');
+      const out = { template: tmpl, buylist: buyList, months:{} };
+      const results = await Promise.all(monthKeys.map(k=>sGet(k)));
+      monthKeys.forEach((k,idx)=>{ out.months[k] = results[idx]; });
+      downloadJson({ type:'money-plan-full-backup', exportedAt: new Date().toISOString(), data: out }, 'money-plan-backup.json');
+      btn.disabled = false; btn.textContent = '내보내기';
+      closeMoneyExportModal();
+      return;
+    }
+    const sy = +document.getElementById('moneyExportStartYearSel').value;
+    const sm = +document.getElementById('moneyExportStartMonthSel').value;
+    const ey = +document.getElementById('moneyExportEndYearSel').value;
+    const em = +document.getElementById('moneyExportEndMonthSel').value;
+    let startIdx = sy*12+(sm-1), endIdx = ey*12+(em-1);
+    if(startIdx > endIdx){ const t=startIdx; startIdx=endIdx; endIdx=t; }
+    btn.disabled = true; btn.textContent = '만드는 중...';
+    const catTemplate = window.__moneyCategoryTemplate || [];
+    const tmpl = await sGet('category-template');
+    let pages = '';
+    for(let idx=startIdx; idx<=endIdx; idx++){
+      const y = Math.floor(idx/12), m = (idx%12)+1;
+      pages += await buildMoneyExportPage(y+'-'+pad(m), catTemplate, tmpl);
+    }
+    btn.disabled = false; btn.textContent = '내보내기';
+    closeMoneyExportModal();
     triggerPrint(pages);
   };
 
