@@ -6742,10 +6742,28 @@ function periodRangeLabel(monthStr){
   const yy = String(y).slice(-2);
   return `${yy}년 ${m}/${PAYDAY} ~ ${endM}/${PAYDAY-1}`;
 }
+// 고정일 공휴일만 간단히 체크 (음력 공휴일은 제외 - 월급일 근처엔 영향이 크지 않아 생략)
+const MONEY_FIXED_HOLIDAYS = ['01-01','03-01','05-05','06-06','08-15','10-03','10-09','12-25'];
+function moneyIsWeekendOrHoliday(d){
+  const dow = d.getDay();
+  if(dow === 0 || dow === 6) return true;
+  const mmdd = String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return MONEY_FIXED_HOLIDAYS.includes(mmdd);
+}
+function moneyActualPaydayDate(year, month0){ // month0: 0~11
+  let d = new Date(year, month0, PAYDAY);
+  while(moneyIsWeekendOrHoliday(d)){
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate()-1);
+  }
+  return d;
+}
 function nextSettlementDdayLabel(){
   const today = new Date();
   today.setHours(0,0,0,0);
-  const target = new Date(today.getFullYear(), today.getMonth()+1, PAYDAY);
+  let target = moneyActualPaydayDate(today.getFullYear(), today.getMonth());
+  if(target < today){
+    target = moneyActualPaydayDate(today.getFullYear(), today.getMonth()+1);
+  }
   const diff = Math.round((target - today) / 86400000);
   if(diff === 0) return 'D-DAY';
   return 'D-' + diff;
