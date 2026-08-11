@@ -72,6 +72,8 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   #tabbar{
@@ -288,7 +290,7 @@
   }
 #app-planner .event-input:focus { border-color:var(--navy); }
 #app-planner .event-date-row { display:flex; gap:14px; }
-#app-planner .event-date-col { flex:1; min-width:0; }
+#app-planner .event-date-col { flex:1; min-width:0; overflow:hidden; box-sizing:border-box; }
 #app-planner .event-color-row { display:flex; gap:7px; margin-bottom:4px; }
 #app-planner .event-color-swatch {
     width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer; padding:0;
@@ -1215,7 +1217,7 @@
   #app-routine .modal .time-row .field { flex-basis: 100%; }
 }
 #app-routine .modal h2 { font-size: 15px; font-weight: 600; margin: 0 0 14px; }
-#app-routine .modal .field { margin-bottom: 12px; min-width: 0; }
+#app-routine .modal .field { margin-bottom: 12px; min-width: 0; overflow:hidden; }
 #app-routine .modal label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 4px; }
 #app-routine .modal input[type="time"], #app-routine .modal textarea {
     width: 100%;
@@ -1582,7 +1584,8 @@
 #app-diet .card {background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(46,42,34,.03);}
 #app-diet .card h2 {font-size:clamp(13px,3vw,15px);margin:0 0 4px;color:var(--sage-deep);display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;}
 #app-diet .card .hint {font-size:11.5px;color:var(--sub);margin-bottom:14px;}
-#app-diet .row {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+#app-diet .row {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;max-width:100%;}
+#app-diet .row > div {overflow:hidden; box-sizing:border-box;}
 #app-diet .row > div {flex:1;min-width:80px;}
 #app-diet label {font-size:clamp(10px,2.2vw,11.5px);color:var(--sub);display:block;margin-bottom:4px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-diet input, #app-diet select {width:100%;height:42px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font-size:clamp(11px,2.6vw,14px);background:var(--cream);color:var(--ink);}
@@ -1767,6 +1770,7 @@
         <span class="subrange" id="subRange"></span>
         <button class="cal-navbtn header-navbtn" id="nextWeek" title="다음 주">›</button>
         <button class="navbtn" id="resetGearBtn" title="데이터 초기화" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+        <button class="navbtn" onclick="openWeeklyListModal()" title="List" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg></button>
         <button class="navbtn" onclick="openWeeklyExportModal()" title="내보내기" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
         <div class="save-group">
           <button class="save-btn" id="saveBtn">저장</button>
@@ -1825,6 +1829,7 @@
         <div class="m-savegroup">
           <div style="display:flex; align-items:center; gap:6px;">
             <button class="navbtn" id="mResetGearBtn" title="데이터 초기화" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
+            <button class="navbtn" onclick="openWeeklyListModal()" title="List" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg></button>
             <button class="navbtn" onclick="openWeeklyExportModal()" title="내보내기" style="width:28px; height:28px; display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
             <button class="save-btn" id="mSaveBtn">저장</button>
           </div>
@@ -2378,7 +2383,7 @@
         <div style="flex:1; min-width:130px;"><label>보관 위치</label><select id="itemSlot"></select></div>
       </div>
       <div class="row" style="margin-bottom:16px;">
-        <div style="flex:1; min-width:150px;"><label>소비기한</label><input type="date" id="itemExpire"></div>
+        <div style="flex:1; min-width:0; max-width:100%; overflow:hidden; box-sizing:border-box;"><label>소비기한</label><input type="date" id="itemExpire" style="max-width:100%; box-sizing:border-box; overflow:hidden;"></div>
         <div style="flex:1.6; min-width:200px;"><label>용도 (어떤 요리?)</label><input type="text" id="itemPurpose" placeholder="예: 그릭요거트"></div>
       </div>
       <div style="display:flex;gap:6px; margin-top:4px;">
@@ -8337,6 +8342,18 @@ window.confirmDietReset = confirmDietReset;
 
 })();
 </script>
+<div class="export-modal-overlay" id="weeklyListOverlay" onclick="if(event.target===this) closeWeeklyListModal()">
+  <div class="export-modal-box" style="max-width:360px;">
+    <h3>📋 List <button class="modal-close" onclick="closeWeeklyListModal()">✕</button></h3>
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      <input type="text" id="weeklyListInput" placeholder="할 일 입력" style="flex:1; border:1px solid #ddd; border-radius:7px; padding:7px 9px; font-size:13px; font-family:inherit; background:#fff;">
+      <button class="export-btn-primary" id="weeklyListAddBtn" style="padding:7px 14px;">추가</button>
+    </div>
+    <div id="weeklyListItems" style="display:flex; flex-direction:column; gap:4px; max-height:320px; overflow-y:auto;"></div>
+    <div id="weeklyListEmpty" style="font-size:12.5px; color:#8890a0; text-align:center; padding:10px 0; display:none;">아직 담긴 항목이 없어요</div>
+  </div>
+</div>
+
 <div class="export-modal-overlay" id="weeklyExportOverlay" onclick="if(event.target===this) closeWeeklyExportModal()">
   <div class="export-modal-box">
     <h3>Weekly 내보내기 <button class="modal-close" onclick="closeWeeklyExportModal()">✕</button></h3>
@@ -8465,6 +8482,70 @@ window.confirmDietReset = confirmDietReset;
     setTimeout(()=>URL.revokeObjectURL(url), 1000);
   }
   function monthLabel(y,m){ return y+'년 '+(m+1)+'월'; }
+
+  /* ============ WEEKLY List (기간 상관없이 하나로 이어짐) ============ */
+  let weeklyList = [];
+  async function loadWeeklyList(){
+    const saved = await sGet('weekly-list');
+    weeklyList = Array.isArray(saved) ? saved : [];
+  }
+  async function saveWeeklyList(){
+    try{ await window.storage.set('weekly-list', JSON.stringify(weeklyList), false); }
+    catch(e){ console.error('weekly list save failed', e); }
+  }
+  function renderWeeklyList(){
+    const container = document.getElementById('weeklyListItems');
+    const emptyEl = document.getElementById('weeklyListEmpty');
+    if(weeklyList.length === 0){
+      container.innerHTML = '';
+      emptyEl.style.display = 'block';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    container.innerHTML = weeklyList.map(item => `
+      <label style="display:flex; align-items:center; gap:8px; padding:7px 9px; border-radius:8px; background:#f7f6f2; border:1px solid #eee; cursor:pointer;">
+        <input type="checkbox" data-wl-id="${item.id}" ${item.checked ? 'checked' : ''} style="width:16px; height:16px; flex-shrink:0;">
+        <span style="flex:1; font-size:13px; ${item.checked ? 'text-decoration:line-through; color:#999;' : 'color:#1a1f2e;'}">${escapeHtml(item.text)}</span>
+        <span data-wl-del="${item.id}" style="cursor:pointer; color:#c1443c; font-weight:700; font-size:13px; padding:0 2px;">×</span>
+      </label>
+    `).join('');
+    container.querySelectorAll('[data-wl-id]').forEach(cb=>{
+      cb.addEventListener('change', async ()=>{
+        const item = weeklyList.find(x=>x.id===cb.dataset.wlId);
+        if(item){ item.checked = cb.checked; await saveWeeklyList(); renderWeeklyList(); }
+      });
+    });
+    container.querySelectorAll('[data-wl-del]').forEach(del=>{
+      del.addEventListener('click', async ()=>{
+        weeklyList = weeklyList.filter(x=>x.id!==del.dataset.wlDel);
+        await saveWeeklyList(); renderWeeklyList();
+      });
+    });
+  }
+  window.openWeeklyListModal = async function(){
+    await loadWeeklyList();
+    renderWeeklyList();
+    document.getElementById('weeklyListOverlay').classList.add('open');
+    document.getElementById('weeklyListInput').value = '';
+    setTimeout(()=> document.getElementById('weeklyListInput').focus(), 0);
+  };
+  window.closeWeeklyListModal = function(){
+    document.getElementById('weeklyListOverlay').classList.remove('open');
+  };
+  async function addWeeklyListItem(){
+    const input = document.getElementById('weeklyListInput');
+    const text = input.value.trim();
+    if(!text) return;
+    weeklyList.push({ id:'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), text, checked:false });
+    await saveWeeklyList();
+    input.value = '';
+    renderWeeklyList();
+    input.focus();
+  }
+  document.getElementById('weeklyListAddBtn').addEventListener('click', addWeeklyListItem);
+  document.getElementById('weeklyListInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addWeeklyListItem(); }
+  });
 
   /* ============ WEEKLY 내보내기 ============ */
   let weeklyFormat = 'pdf';
