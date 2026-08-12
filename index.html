@@ -823,7 +823,10 @@
 #app-monthly .mp-header {
     display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:nowrap;
   }
-#app-monthly .mp-title { font-size:clamp(15px,5vw,24px); font-weight:800; color:var(--navy); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+#app-monthly .mp-title { text-align:left; font-size:clamp(15px,5vw,24px); font-weight:800; color:var(--navy); letter-spacing:-0.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+#app-monthly #mpResetGearBtn {
+    margin-left:auto;
+  }
 #app-monthly .mp-navbtn.m-reset-boxed {
     border:1px solid var(--grid); background:#fff; color:var(--navy);
     width:28px; height:28px; border-radius:8px; margin-left:2px;
@@ -841,7 +844,7 @@
     flex-shrink:0; white-space:nowrap;
   }
 #app-monthly .mp-today-btn:hover { background:var(--grid-soft); color:var(--navy); border-color:var(--navy); }
-#app-monthly .mp-save-status { margin-left:auto; font-size:11.5px; color:var(--muted); }
+#app-monthly .mp-save-status { position:absolute; top:100%; right:0; margin-top:2px; font-size:11.5px; color:var(--muted); white-space:nowrap; }
 #app-monthly .mp-cal-card {
     border:2px solid var(--navy); border-radius:10px; background:var(--card);
     overflow:hidden; margin-bottom:24px;
@@ -1979,14 +1982,14 @@
 <div id="app-monthly" class="app-panel">
 
 <div class="mp-wrap">
-  <div class="mp-header">
+  <div class="mp-header" style="position:relative;">
     <button class="mp-navbtn" id="mpPrevMonth" title="이전 달">‹</button>
     <div class="mp-title" id="mpTitle"></div>
     <button class="mp-navbtn" id="mpNextMonth" title="다음 달">›</button>
-    <span class="mp-save-status" id="mpSaveStatus"></span>
     <button class="mp-navbtn m-reset-boxed" id="mpResetGearBtn" title="데이터 초기화" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" style="transform:rotate(90deg);"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg></button>
     <button class="mp-navbtn m-reset-boxed" onclick="openMonthlyExportModal()" title="내보내기" style="display:flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
     <button class="mp-today-btn" id="mpTodayBtn" title="이번 달로 이동">오늘</button>
+    <span class="mp-save-status" id="mpSaveStatus"></span>
   </div>
 
   <div class="mp-cal-card">
@@ -5379,8 +5382,21 @@ function renderUpcomingEvents(){
     }
     mpHabitNamePaneEl.innerHTML = nameHtml;
 
-    // 날짜 칸(스크롤 영역) 렌더링 — 데스크톱은 1fr로 꽉 채우고, 모바일은 한 화면에 7개가 오도록 고정폭
-    const mobileDayWidth = isMobileHabit ? Math.max(28, Math.floor(mpHabitScrollAreaEl.clientWidth / 7)) : null;
+    // 날짜 칸 크기는 원래(7칸 기준) 크기 그대로 유지하고, 5칸만 보이게 하면서 남는 폭은 이름칸에 몰아준다
+    const MOBILE_NAMEPANE_BASE = 90;
+    let mobileDayWidth = null;
+    if(isMobileHabit){
+      const wrapEl = mpHabitNamePaneEl.parentElement;
+      const totalW = wrapEl ? wrapEl.clientWidth : (mpHabitScrollAreaEl.clientWidth + MOBILE_NAMEPANE_BASE);
+      const refScrollW = totalW - MOBILE_NAMEPANE_BASE;
+      mobileDayWidth = Math.max(28, Math.floor(refScrollW / 7)); // 기존(7칸 기준) 칸 크기 그대로
+      const newNamePaneW = MOBILE_NAMEPANE_BASE + mobileDayWidth * 2; // 안 보이게 된 2칸만큼 이름칸에 추가
+      mpHabitNamePaneEl.style.width = newNamePaneW + 'px';
+      mpHabitNamePaneEl.style.flex = '0 0 ' + newNamePaneW + 'px';
+    } else {
+      mpHabitNamePaneEl.style.width = '';
+      mpHabitNamePaneEl.style.flex = '';
+    }
     mpHabitGridEl.style.gridTemplateColumns = isMobileHabit
       ? ('repeat(' + total + ', ' + mobileDayWidth + 'px)')
       : ('repeat(' + total + ', 1fr)');
