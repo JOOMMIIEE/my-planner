@@ -1612,6 +1612,9 @@
 #app-diet table {width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 #app-diet th {text-align:left;padding:6px 4px;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;}
 #app-diet td {padding:8px 4px;border-bottom:1px dashed var(--sage-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:640px){
+  #app-diet #itemExpireWrap { flex:0 0 118px !important; }
+}
 #app-diet tr:last-child td {border-bottom:none;}
 #app-diet .col-name {width:32%;}
 #app-diet .col-num {width:14%;text-align:right;}
@@ -2397,7 +2400,7 @@
         <div style="flex:1; min-width:130px;"><label style="display:flex; align-items:center; gap:5px;"><span>보관 위치</span><span onclick="openSlotManageModal()" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:var(--sage); font-size:13px; flex-shrink:0; transform:scaleX(-1);" title="보관 위치 수정">✎</span></label><select id="itemSlot"></select></div>
       </div>
       <div class="row" style="margin-bottom:16px;">
-        <div style="flex:1; min-width:0; max-width:100%; overflow:hidden; box-sizing:border-box;"><label>소비기한</label><input type="date" id="itemExpire" style="max-width:100%; box-sizing:border-box; overflow:hidden;"></div>
+        <div id="itemExpireWrap" style="flex:1; min-width:0; max-width:100%; overflow:hidden; box-sizing:border-box;"><label>소비기한</label><input type="text" inputmode="numeric" id="itemExpire" placeholder="20260827" maxlength="11" oninput="formatExpireInput(this)" onfocus="this.select()" onblur="resetExpireIfInvalid(this)" style="max-width:100%; box-sizing:border-box; overflow:hidden;"></div>
         <div style="flex:1.6; min-width:200px;"><label>용도 (어떤 요리?)</label><input type="text" id="itemPurpose" placeholder="예: 그릭요거트"></div>
       </div>
       <div style="display:flex;gap:6px; margin-top:4px;">
@@ -2446,6 +2449,25 @@
   <div class="modal-box">
     <h3>⭐ 즐겨찾기 목록 <button class="modal-close" onclick="toggleFavPanel()">✕</button></h3>
     <div id="favListInner"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="moveItemModal" onclick="if(event.target===this) closeMoveItemModal()">
+  <div class="modal-box" style="max-width:340px;">
+    <h3>재료 이동 <button class="modal-close" onclick="closeMoveItemModal()">✕</button></h3>
+    <div id="moveItemName" style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:12px;"></div>
+    <label>구역</label>
+    <div class="zone-toggle" id="moveItemZoneToggle" style="margin-bottom:12px;">
+      <button type="button" class="zone-btn" data-zone="냉장" onclick="pickMoveZone('냉장')">냉장</button>
+      <button type="button" class="zone-btn" data-zone="냉동" onclick="pickMoveZone('냉동')">냉동</button>
+      <button type="button" class="zone-btn" data-zone="실온" onclick="pickMoveZone('실온')">실온</button>
+    </div>
+    <label>보관 위치</label>
+    <select id="moveItemSlot" style="margin-bottom:14px;"></select>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="action cancel" onclick="closeMoveItemModal()">취소</button>
+      <button class="action" onclick="confirmMoveItem()">이동</button>
+    </div>
   </div>
 </div>
 
@@ -8096,6 +8118,44 @@ function renderFavPanel(){
   }).join('');
 }
 
+let moveItemIdx = null;
+let moveItemZone = '냉장';
+function openMoveItemModal(idx){
+  const it = fridgeItems[idx];
+  if(!it) return;
+  moveItemIdx = idx;
+  moveItemZone = it.zone;
+  document.getElementById('moveItemName').textContent = it.name;
+  document.querySelectorAll('#moveItemZoneToggle .zone-btn').forEach(b=>b.classList.toggle('selected', b.dataset.zone===it.zone));
+  populateMoveItemSlotSelect(it.slot);
+  document.getElementById('moveItemModal').classList.add('open');
+}
+function closeMoveItemModal(){
+  document.getElementById('moveItemModal').classList.remove('open');
+  moveItemIdx = null;
+}
+function pickMoveZone(z){
+  moveItemZone = z;
+  document.querySelectorAll('#moveItemZoneToggle .zone-btn').forEach(b=>b.classList.toggle('selected', b.dataset.zone===z));
+  populateMoveItemSlotSelect();
+}
+function populateMoveItemSlotSelect(keepSlot){
+  const sel = document.getElementById('moveItemSlot');
+  const opts = SLOT_OPTIONS[moveItemZone] || [];
+  sel.innerHTML = opts.map(s=>`<option value="${s}">${s}</option>`).join('');
+  if(keepSlot && opts.includes(keepSlot)) sel.value = keepSlot;
+}
+function confirmMoveItem(){
+  if(moveItemIdx === null) return;
+  const it = fridgeItems[moveItemIdx];
+  if(!it) return;
+  it.zone = moveItemZone;
+  it.slot = document.getElementById('moveItemSlot').value;
+  saveFridge();
+  renderFridge();
+  closeMoveItemModal();
+}
+
 function openFridgeSearchModal(){
   document.getElementById('fridgeSearchInput').value = '';
   renderFridgeSearchResults();
@@ -8212,15 +8272,41 @@ function pickZone(z, keepSlot){
   updateSlotSelectOptions(keepSlot);
 }
 function todayStr(offsetDays){ return toISO(addDays(new Date(), offsetDays||0)); }
+function formatDateDisplay(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${y}.${m}.${d}.`;
+}
+function resetExpireIfInvalid(el){
+  const digits = el.value.replace(/[^0-9]/g, '');
+  if(digits.length !== 8){
+    el.value = formatDateDisplay(todayStr(0));
+  }
+}
+function formatExpireInput(el){
+  let digits = el.value.replace(/[^0-9]/g, '').slice(0, 8);
+  let out = '';
+  if(digits.length <= 4){ out = digits; }
+  else if(digits.length <= 6){ out = digits.slice(0,4)+'.'+digits.slice(4); }
+  else { out = digits.slice(0,4)+'.'+digits.slice(4,6)+'.'+digits.slice(6); }
+  if(digits.length === 8) out += '.';
+  el.value = out;
+}
+function expireInputToISO(text){
+  const digits = (text||'').replace(/[^0-9]/g, '');
+  if(digits.length !== 8) return '';
+  return `${digits.slice(0,4)}-${digits.slice(4,6)}-${digits.slice(6,8)}`;
+}
 function setDefaultDates(){
-  document.getElementById('itemExpire').value = todayStr(7);
+  document.getElementById('itemExpire').value = formatDateDisplay(todayStr(7));
 }
 function submitItem(){
   const name = document.getElementById('itemName').value.trim();
   const slot = document.getElementById('itemSlot').value.trim();
-  const expire = document.getElementById('itemExpire').value;
+  const expire = expireInputToISO(document.getElementById('itemExpire').value);
   const purpose = document.getElementById('itemPurpose').value.trim();
   if(!name){ alert('재료 이름을 입력해주세요'); return; }
+  if(!expire){ alert('소비기한을 8자리 숫자로 입력해주세요 (예: 20260827)'); return; }
   fridgeItems.push({name, zone:selectedZone, slot, expire, purpose});
   saveFridge(); renderFridge();
   // 구역은 유지하고, 이름/용도/날짜만 다음 입력을 위해 초기화
@@ -8245,39 +8331,6 @@ function commitFridgeField(i){
   fridgeItems[i] = {...fridgeItems[i], name, purpose, expire};
   saveFridge(); renderFridge();
 }
-let pendingSlotIdx = null;
-let pendingSlotValue = null;
-let pendingSlotIdleTimer = null;
-function commitPendingSlot(){
-  if(pendingSlotIdx === null) return;
-  clearTimeout(pendingSlotIdleTimer);
-  if(fridgeItems[pendingSlotIdx]){
-    fridgeItems[pendingSlotIdx].slot = pendingSlotValue;
-    saveFridge();
-  }
-  pendingSlotIdx = null;
-  pendingSlotValue = null;
-  renderFridge();
-}
-function handleSlotBadgeClick(el, i){
-  if(pendingSlotIdx !== null && pendingSlotIdx !== i){
-    commitPendingSlot();
-    return;
-  }
-  const it = fridgeItems[i];
-  const opts = SLOT_OPTIONS[it.zone];
-  if(pendingSlotIdx === null){
-    pendingSlotIdx = i;
-    pendingSlotValue = it.slot;
-  }
-  const curIdx = opts.indexOf(pendingSlotValue);
-  pendingSlotValue = opts[(curIdx+1) % opts.length];
-  el.textContent = SLOT_SHORT_LABELS[pendingSlotValue] || pendingSlotValue;
-  clearTimeout(pendingSlotIdleTimer);
-  pendingSlotIdleTimer = setTimeout(commitPendingSlot, 3000);
-}
-document.addEventListener('click', ()=>{ commitPendingSlot(); });
-window.addEventListener('scroll', ()=>{ commitPendingSlot(); }, true);
 function shortDate(d){
   if(!d) return '-';
   const parts = d.split('-');
@@ -8313,26 +8366,26 @@ function renderFridge(){
       .sort((a,b)=>{ if(!a.expire) return 1; if(!b.expire) return -1; return fromISO(a.expire)-fromISO(b.expire); });
     if(items.length===0) return;
     html += `<div class="meal-section"><div class="meal-title"><span>${slot}</span><span class="sub-total">${items.length}개</span></div>
-      <table><colgroup><col><col style="width:70px"><col style="width:64px"><col><col style="width:26px"></colgroup>
-      <thead><tr><th style="text-align:left; padding-left:12px;">재료</th><th style="text-align:center;">소비기한</th><th style="text-align:center;">상태</th><th>용도</th><th></th></tr></thead><tbody>`;
+      <table><colgroup><col><col style="width:64px"><col><col style="width:48px"></colgroup>
+      <thead><tr><th style="text-align:left; padding-left:12px;">재료</th><th style="text-align:center;">상태</th><th>용도</th><th></th></tr></thead><tbody>`;
     items.forEach(it=>{
       html += `<tr data-fridge-row="${it.idx}">
           <td>
             <div style="display:flex; align-items:center; justify-content:flex-start; gap:6px;">
-              <span class="diet-slot-badge zone-${it.zone}" data-idx="${it.idx}" title="탭하면 보관 위치가 바뀌고, 다른 곳을 누르면 그쪽으로 옮겨가요">${SLOT_SHORT_LABELS[it.slot] || it.slot}</span>
+              <span class="diet-slot-badge zone-${it.zone}" style="cursor:default;" title="${it.zone} · ${it.slot} (⇄로 이동)">${SLOT_SHORT_LABELS[it.slot] || it.slot}</span>
               <span class="etext" data-field="name" contenteditable="true" style="display:block; flex:1; min-width:0; overflow:hidden; text-align:left;">${it.name}</span>
             </div>
           </td>
-          <td style="white-space:nowrap; overflow:visible; text-align:center;">
-            <span class="fridge-expire-disp" style="line-height:1; position:relative; display:inline-block; cursor:pointer;">
-              ${shortDate(it.expire)}
+          <td style="text-align:center; padding:8px 4px; overflow:visible; white-space:nowrap;">
+            <span style="position:relative; display:inline-block; cursor:pointer;" title="탭해서 소비기한 수정">
+              ${statusBadge(it.expire)}
               <input type="date" class="fridge-expire-hidden" data-field="expire" value="${it.expire||''}">
             </span>
           </td>
-          <td style="text-align:center; padding:8px 4px; overflow:visible; white-space:nowrap;">${statusBadge(it.expire)}</td>
           <td style="padding:8px 4px;"><span class="etext" data-field="purpose" contenteditable="true" style="display:block; width:100%; overflow:hidden; text-align:left;">${it.purpose||''}</span></td>
           <td style="white-space:nowrap; padding:8px 2px;">
-            <div style="display:flex;align-items:center;justify-content:flex-end;">
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:2px;">
+              <button class="icon-btn" onclick="openMoveItemModal(${it.idx})" title="다른 구역/위치로 이동" style="color:var(--sage-deep);">⇄</button>
               <button class="icon-btn del" onclick="removeItem(${it.idx})" title="삭제">✕</button>
             </div>
           </td>
@@ -8345,12 +8398,6 @@ function renderFridge(){
     el.addEventListener('change', ()=>{
       const row = el.closest('[data-fridge-row]');
       if(row) commitFridgeField(+row.dataset.fridgeRow);
-    });
-  });
-  container.querySelectorAll('.diet-slot-badge').forEach(el=>{
-    el.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      handleSlotBadgeClick(el, +el.dataset.idx);
     });
   });
   container.querySelectorAll('[data-field]').forEach(el=>{
@@ -8553,6 +8600,12 @@ window.removeFav = removeFav;
 window.saveFavEdit = saveFavEdit;
 window.cancelFavEdit = cancelFavEdit;
 window.pickZone = pickZone;
+window.openMoveItemModal = openMoveItemModal;
+window.closeMoveItemModal = closeMoveItemModal;
+window.pickMoveZone = pickMoveZone;
+window.confirmMoveItem = confirmMoveItem;
+window.formatExpireInput = formatExpireInput;
+window.resetExpireIfInvalid = resetExpireIfInvalid;
 window.openFridgeSearchModal = openFridgeSearchModal;
 window.closeFridgeSearchModal = closeFridgeSearchModal;
 window.renderFridgeSearchResults = renderFridgeSearchResults;
