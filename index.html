@@ -1611,7 +1611,7 @@
 #app-diet button.icon-btn.del:hover {background:var(--clay-light);}
 #app-diet table {width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 #app-diet th {text-align:left;padding:6px 4px;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line);font-size:11.5px;white-space:nowrap;}
-#app-diet td {padding:8px 4px;border-bottom:1px solid var(--sage-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#app-diet td {padding:8px 4px;border-bottom:1px dashed var(--sage-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #app-diet tr:last-child td {border-bottom:none;}
 #app-diet .col-name {width:32%;}
 #app-diet .col-num {width:14%;text-align:right;}
@@ -1665,8 +1665,8 @@
 #app-diet .badge.over {background:var(--clay-light);color:var(--clay);}
 #app-diet .empty {text-align:center;color:var(--sub);font-size:12.5px;padding:16px 0;}
 #app-diet .divider {height:1px;background:var(--line);margin:16px 0;}
-#app-diet .zone-toggle {display:flex;gap:8px;height:42px;}
-#app-diet .zone-btn {flex:1;height:42px;padding:0 8px;border-radius:8px;border:2px solid var(--line);background:var(--cream);font-size:clamp(11px,2.6vw,13px);font-weight:700;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;}
+#app-diet .zone-toggle {display:flex;gap:4px;height:42px;min-width:0;}
+#app-diet .zone-btn {flex:1;min-width:0;height:42px;padding:0 4px;border-radius:8px;border:2px solid var(--line);background:var(--cream);font-size:clamp(10px,2.4vw,13px);font-weight:700;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;overflow:hidden;gap:2px;}
 #app-diet .zone-btn[data-zone="냉장"].selected {background:var(--clay-light);border-color:var(--clay);color:var(--clay);}
 #app-diet .zone-btn[data-zone="냉동"].selected {background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
 #app-diet .zone-btn[data-zone="실온"].selected {background:var(--sage-light);border-color:var(--sage);color:var(--sage-deep);}
@@ -1685,10 +1685,11 @@
 #app-diet .inline-edit-row input, #app-diet .inline-edit-row select {height:34px;font-size:12.5px;padding:0 6px;}
 #app-diet .inline-edit-actions {display:flex;gap:4px;justify-content:flex-end;}
 #app-diet .etext {
-    display:inline-block;min-width:16px;outline:none;border-bottom:1.5px dashed var(--line);
-    padding:1px 2px;font:inherit;color:inherit;
+    display:inline-block;min-width:16px;outline:none;border-bottom:1.5px solid transparent;
+    padding:1px 2px;font:inherit;color:inherit;border-radius:4px;
   }
-#app-diet .etext:focus {border-bottom-color:var(--sage);}
+#app-diet .etext:focus {background:var(--sage-light);}
+#app-diet .etext:empty:before {content:"-"; color:#c3c8d4;}
 #app-diet select.etext-meal {
     width:auto;height:22px;padding:0 2px;font-size:10.5px;border:1px solid var(--line);border-radius:5px;
     background:var(--cream);margin-right:2px;vertical-align:middle;
@@ -2385,15 +2386,15 @@
       <h2 id="fridgeFormTitle">새로 넣기</h2>
       <div class="row">
         <div style="flex:1.4; min-width:160px;"><label>재료 이름</label><input type="text" id="itemName" placeholder="예: 두부"></div>
-        <div style="flex:1; min-width:170px;">
+        <div style="flex:1; min-width:150px;">
           <label>구역</label>
           <div class="zone-toggle">
-            <button type="button" class="zone-btn selected" data-zone="냉장" onclick="pickZone('냉장')">💧 냉장</button>
-            <button type="button" class="zone-btn" data-zone="냉동" onclick="pickZone('냉동')">🧊 냉동</button>
-            <button type="button" class="zone-btn" data-zone="실온" onclick="pickZone('실온')">🌿 실온</button>
+            <button type="button" class="zone-btn selected" data-zone="냉장" onclick="pickZone('냉장')">냉장</button>
+            <button type="button" class="zone-btn" data-zone="냉동" onclick="pickZone('냉동')">냉동</button>
+            <button type="button" class="zone-btn" data-zone="실온" onclick="pickZone('실온')">실온</button>
           </div>
         </div>
-        <div style="flex:1; min-width:130px;"><label>보관 위치 <span onclick="openSlotManageModal()" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--sage); color:#fff; font-size:11px; font-weight:800; vertical-align:middle;" title="보관 위치 수정">+</span></label><select id="itemSlot"></select></div>
+        <div style="flex:1; min-width:130px;"><label style="display:flex; align-items:center; gap:5px;"><span>보관 위치</span><span onclick="openSlotManageModal()" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:var(--sage); font-size:13px; flex-shrink:0; transform:scaleX(-1);" title="보관 위치 수정">✎</span></label><select id="itemSlot"></select></div>
       </div>
       <div class="row" style="margin-bottom:16px;">
         <div style="flex:1; min-width:0; max-width:100%; overflow:hidden; box-sizing:border-box;"><label>소비기한</label><input type="date" id="itemExpire" style="max-width:100%; box-sizing:border-box; overflow:hidden;"></div>
@@ -2406,7 +2407,12 @@
     </div>
 
     <div class="card">
-      <h2>냉장고 속 재료</h2>
+      <h2 style="display:flex; align-items:center; justify-content:flex-start; gap:6px;">
+        <span>냉장고 속 재료</span>
+        <span onclick="openFridgeSearchModal()" style="cursor:pointer; color:var(--sub); display:inline-flex; align-items:center; justify-content:center;" title="재료 검색">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+      </h2>
       <div class="zone-tabs">
         <button class="zone-tab-btn active" data-zone="냉장" id="zoneTabBtn-냉장" onclick="switchZoneTab('냉장')">냉장</button>
         <button class="zone-tab-btn" data-zone="냉동" id="zoneTabBtn-냉동" onclick="switchZoneTab('냉동')">냉동</button>
@@ -2440,6 +2446,14 @@
   <div class="modal-box">
     <h3>⭐ 즐겨찾기 목록 <button class="modal-close" onclick="toggleFavPanel()">✕</button></h3>
     <div id="favListInner"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="fridgeSearchModal" onclick="if(event.target===this) closeFridgeSearchModal()">
+  <div class="modal-box" style="max-width:360px;">
+    <h3>재료 검색 <button class="modal-close" onclick="closeFridgeSearchModal()">✕</button></h3>
+    <input type="text" id="fridgeSearchInput" placeholder="예: 마요네즈" oninput="renderFridgeSearchResults()" style="margin-bottom:10px;">
+    <div id="fridgeSearchResults" style="display:flex; flex-direction:column; gap:6px; max-height:320px; overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -8082,6 +8096,43 @@ function renderFavPanel(){
   }).join('');
 }
 
+function openFridgeSearchModal(){
+  document.getElementById('fridgeSearchInput').value = '';
+  renderFridgeSearchResults();
+  document.getElementById('fridgeSearchModal').classList.add('open');
+  setTimeout(()=> document.getElementById('fridgeSearchInput').focus(), 0);
+}
+function closeFridgeSearchModal(){
+  document.getElementById('fridgeSearchModal').classList.remove('open');
+}
+function renderFridgeSearchResults(){
+  const q = document.getElementById('fridgeSearchInput').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('fridgeSearchResults');
+  if(!q){ resultsEl.innerHTML = '<div style="font-size:12px; color:var(--sub); text-align:center; padding:10px 0;">재료 이름이나 용도를 입력해보세요</div>'; return; }
+  const matched = fridgeItems
+    .map((it,idx)=>({...it, idx}))
+    .filter(it => (it.name && it.name.toLowerCase().includes(q)) || (it.purpose && it.purpose.toLowerCase().includes(q)));
+  if(matched.length===0){
+    resultsEl.innerHTML = '<div style="font-size:12px; color:var(--sub); text-align:center; padding:10px 0;">저장된 재료 중에 없어요</div>';
+    return;
+  }
+  resultsEl.innerHTML = matched.map(it=>`
+    <div onclick="jumpToFridgeItem(${it.idx})" style="cursor:pointer; padding:9px 10px; border-radius:8px; background:var(--cream); border:1px solid var(--line);">
+      <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+        <span class="diet-slot-badge zone-${it.zone}" style="font-size:10px;">${SLOT_SHORT_LABELS[it.slot] || it.slot}</span>
+        <span style="font-weight:700; font-size:13px; color:var(--ink);">${escapeHtml(it.name)}</span>
+        <span style="margin-left:auto; font-size:11px; color:var(--sub); white-space:nowrap;">${shortDate(it.expire)}</span>
+      </div>
+      <div style="font-size:11.5px; color:var(--sub);">용도: ${it.purpose ? escapeHtml(it.purpose) : '-'}</div>
+    </div>
+  `).join('');
+}
+function jumpToFridgeItem(idx){
+  const it = fridgeItems[idx];
+  if(!it) return;
+  closeFridgeSearchModal();
+  switchZoneTab(it.zone);
+}
 function openSlotManageModal(){
   document.getElementById('slotManageTitle').innerHTML = `보관 위치 수정 (${selectedZone}) <button class="modal-close" onclick="closeSlotManageModal()">✕</button>`;
   document.getElementById('slotManageInput').value = '';
@@ -8171,7 +8222,11 @@ function submitItem(){
   const purpose = document.getElementById('itemPurpose').value.trim();
   if(!name){ alert('재료 이름을 입력해주세요'); return; }
   fridgeItems.push({name, zone:selectedZone, slot, expire, purpose});
-  saveFridge(); renderFridge(); cancelItemEdit();
+  saveFridge(); renderFridge();
+  // 구역은 유지하고, 이름/용도/날짜만 다음 입력을 위해 초기화
+  ['itemName','itemPurpose'].forEach(id=>document.getElementById(id).value='');
+  setDefaultDates();
+  document.getElementById('itemCancelBtn').style.display = 'none';
 }
 function cancelItemEdit(){
   ['itemName','itemPurpose'].forEach(id=>document.getElementById(id).value='');
@@ -8258,8 +8313,8 @@ function renderFridge(){
       .sort((a,b)=>{ if(!a.expire) return 1; if(!b.expire) return -1; return fromISO(a.expire)-fromISO(b.expire); });
     if(items.length===0) return;
     html += `<div class="meal-section"><div class="meal-title"><span>${slot}</span><span class="sub-total">${items.length}개</span></div>
-      <table><colgroup><col><col style="width:70px"><col style="width:48px"><col><col style="width:26px"></colgroup>
-      <thead><tr><th style="text-align:left; padding-left:56px;">재료</th><th style="text-align:center;">소비기한</th><th style="text-align:center;">상태</th><th>용도</th><th></th></tr></thead><tbody>`;
+      <table><colgroup><col><col style="width:70px"><col style="width:64px"><col><col style="width:26px"></colgroup>
+      <thead><tr><th style="text-align:left; padding-left:12px;">재료</th><th style="text-align:center;">소비기한</th><th style="text-align:center;">상태</th><th>용도</th><th></th></tr></thead><tbody>`;
     items.forEach(it=>{
       html += `<tr data-fridge-row="${it.idx}">
           <td>
@@ -8268,19 +8323,11 @@ function renderFridge(){
               <span class="etext" data-field="name" contenteditable="true" style="display:block; flex:1; min-width:0; overflow:hidden; text-align:left;">${it.name}</span>
             </div>
           </td>
-          <td style="white-space:nowrap; overflow:visible; padding-right:10px;">
-            <div style="display:flex; align-items:center; justify-content:center; gap:1px; line-height:1;">
-              <span class="fridge-expire-disp" style="line-height:1;">${shortDate(it.expire)}</span>
-              <span class="fridge-expire-iconwrap">
-                <svg class="fridge-expire-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
-                  <path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.6"/>
-                  <path d="M8 3V6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                  <path d="M16 3V6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-                <input type="date" class="fridge-expire-hidden" data-field="expire" value="${it.expire||''}">
-              </span>
-            </div>
+          <td style="white-space:nowrap; overflow:visible; text-align:center;">
+            <span class="fridge-expire-disp" style="line-height:1; position:relative; display:inline-block; cursor:pointer;">
+              ${shortDate(it.expire)}
+              <input type="date" class="fridge-expire-hidden" data-field="expire" value="${it.expire||''}">
+            </span>
           </td>
           <td style="text-align:center; padding:8px 4px; overflow:visible; white-space:nowrap;">${statusBadge(it.expire)}</td>
           <td style="padding:8px 4px;"><span class="etext" data-field="purpose" contenteditable="true" style="display:block; width:100%; overflow:hidden; text-align:left;">${it.purpose||''}</span></td>
@@ -8506,6 +8553,10 @@ window.removeFav = removeFav;
 window.saveFavEdit = saveFavEdit;
 window.cancelFavEdit = cancelFavEdit;
 window.pickZone = pickZone;
+window.openFridgeSearchModal = openFridgeSearchModal;
+window.closeFridgeSearchModal = closeFridgeSearchModal;
+window.renderFridgeSearchResults = renderFridgeSearchResults;
+window.jumpToFridgeItem = jumpToFridgeItem;
 window.openSlotManageModal = openSlotManageModal;
 window.closeSlotManageModal = closeSlotManageModal;
 window.addSlotOption = addSlotOption;
