@@ -261,6 +261,11 @@
   }
 #app-planner .subitem-popover-addbtn:hover { background:rgba(0,0,0,0.04); color:var(--navy); }
 #app-planner .subitem-popover-empty { font-size:11.5px; color:#a7adc0; padding:6px 4px; }
+#app-planner .subitem-popover-addbox {
+    border:1.5px dashed var(--grid); background:none; color:var(--muted); font-size:11.5px; font-weight:700;
+    cursor:pointer; width:100%; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; gap:4px;
+  }
+#app-planner .subitem-popover-addbox:hover { background:rgba(0,0,0,0.04); color:var(--navy); border-color:var(--navy); }
 #app-planner .confirm-overlay {
     position:fixed; inset:0; background:rgba(20,25,45,0.42);
     display:none; align-items:center; justify-content:center; z-index:200; padding:20px;
@@ -1664,6 +1669,7 @@
 #app-diet .zone-btn {flex:1;height:42px;padding:0 8px;border-radius:8px;border:2px solid var(--line);background:var(--cream);font-size:clamp(11px,2.6vw,13px);font-weight:700;cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;}
 #app-diet .zone-btn[data-zone="냉장"].selected {background:var(--clay-light);border-color:var(--clay);color:var(--clay);}
 #app-diet .zone-btn[data-zone="냉동"].selected {background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+#app-diet .zone-btn[data-zone="실온"].selected {background:var(--sage-light);border-color:var(--sage);color:var(--sage-deep);}
 #app-diet .zone-tag {font-size:11px;padding:3px 9px;border-radius:10px;font-weight:700;}
 #app-diet .zone-tag.냉장 {background:var(--clay-light);color:var(--clay);}
 #app-diet .zone-tag.냉동 {background:var(--blue-light);color:var(--blue);}
@@ -1671,8 +1677,10 @@
 #app-diet .zone-tab-btn {flex:1;height:42px;border-radius:9px;border:2px solid var(--line);background:var(--white);font-size:clamp(12px,2.8vw,14px);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;}
 #app-diet .zone-tab-btn[data-zone="냉장"] {color:var(--ink);background:#EDEAE2;border-color:#EDEAE2;}
 #app-diet .zone-tab-btn[data-zone="냉동"] {color:var(--ink);background:#EDEAE2;border-color:#EDEAE2;}
+#app-diet .zone-tab-btn[data-zone="실온"] {color:var(--ink);background:#EDEAE2;border-color:#EDEAE2;}
 #app-diet .zone-tab-btn[data-zone="냉장"].active {background:var(--clay);border-color:var(--clay);color:white;}
 #app-diet .zone-tab-btn[data-zone="냉동"].active {background:var(--blue);border-color:var(--blue);color:white;}
+#app-diet .zone-tab-btn[data-zone="실온"].active {background:var(--sage);border-color:var(--sage);color:white;}
 #app-diet .inline-edit-row td {background:var(--sage-light);padding:10px 6px;}
 #app-diet .inline-edit-row input, #app-diet .inline-edit-row select {height:34px;font-size:12.5px;padding:0 6px;}
 #app-diet .inline-edit-actions {display:flex;gap:4px;justify-content:flex-end;}
@@ -1702,6 +1710,7 @@
   }
 #app-diet .diet-slot-badge.zone-냉장 { background:var(--clay-light); color:var(--clay); }
 #app-diet .diet-slot-badge.zone-냉동 { background:var(--blue-light); color:var(--blue); }
+#app-diet .diet-slot-badge.zone-실온 { background:var(--sage-light); color:var(--sage-deep); }
 #app-diet .diet-slot-badge:hover { filter:brightness(0.96); }
 #app-diet input.etext-date {
     width:100%;box-sizing:border-box;height:24px;padding:0 3px;font-size:11px;border:1px solid var(--sage);border-radius:4px;
@@ -2381,9 +2390,10 @@
           <div class="zone-toggle">
             <button type="button" class="zone-btn selected" data-zone="냉장" onclick="pickZone('냉장')">💧 냉장</button>
             <button type="button" class="zone-btn" data-zone="냉동" onclick="pickZone('냉동')">🧊 냉동</button>
+            <button type="button" class="zone-btn" data-zone="실온" onclick="pickZone('실온')">🌿 실온</button>
           </div>
         </div>
-        <div style="flex:1; min-width:130px;"><label>보관 위치</label><select id="itemSlot"></select></div>
+        <div style="flex:1; min-width:130px;"><label>보관 위치 <span onclick="openSlotManageModal()" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:var(--sage); color:#fff; font-size:11px; font-weight:800; vertical-align:middle;" title="보관 위치 수정">+</span></label><select id="itemSlot"></select></div>
       </div>
       <div class="row" style="margin-bottom:16px;">
         <div style="flex:1; min-width:0; max-width:100%; overflow:hidden; box-sizing:border-box;"><label>소비기한</label><input type="date" id="itemExpire" style="max-width:100%; box-sizing:border-box; overflow:hidden;"></div>
@@ -2400,6 +2410,7 @@
       <div class="zone-tabs">
         <button class="zone-tab-btn active" data-zone="냉장" id="zoneTabBtn-냉장" onclick="switchZoneTab('냉장')">냉장</button>
         <button class="zone-tab-btn" data-zone="냉동" id="zoneTabBtn-냉동" onclick="switchZoneTab('냉동')">냉동</button>
+        <button class="zone-tab-btn" data-zone="실온" id="zoneTabBtn-실온" onclick="switchZoneTab('실온')">실온</button>
       </div>
       <div id="fridgeGroups"></div>
       <div id="fridgeEmpty" class="empty">냉장고가 비어있어요</div>
@@ -2429,6 +2440,17 @@
   <div class="modal-box">
     <h3>⭐ 즐겨찾기 목록 <button class="modal-close" onclick="toggleFavPanel()">✕</button></h3>
     <div id="favListInner"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="slotManageModal" onclick="if(event.target===this) closeSlotManageModal()">
+  <div class="modal-box" style="max-width:340px;">
+    <h3 id="slotManageTitle">보관 위치 수정 <button class="modal-close" onclick="closeSlotManageModal()">✕</button></h3>
+    <div id="slotManageList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;"></div>
+    <div style="display:flex; gap:6px;">
+      <input type="text" id="slotManageInput" placeholder="새 보관 위치 이름" style="flex:1;">
+      <button class="action" id="slotManageAddBtn" onclick="addSlotOption()">추가</button>
+    </div>
   </div>
 </div>
 
@@ -3699,15 +3721,31 @@
     const subs = it.subitems;
     subitemPopoverEl.innerHTML = `
       <div class="subitem-popover-title" style="color:${c.text};">${escapeHtml(it.text) || '하위 목록'}</div>
-      ${subs.length===0 ? `<div class="subitem-popover-empty">아직 항목이 없어요</div>` : subs.map(s=>`
+      ${subs.length===0 ? `
+        <button type="button" class="subitem-popover-addbox" data-action="popover-add-subitem" data-item="${itemId}" title="하위 항목 추가">+ 하위항목 추가</button>
+      ` : subs.map(s=>`
         <div class="subitem-row" data-item="${itemId}" data-sub="${s.id}">
           <span class="subitem-bullet" draggable="true" data-item="${itemId}" data-sub="${s.id}" title="끌어서 순서 이동" style="color:${c.dot};">·</span>
           <span class="subitem-text" contenteditable="true" data-action="popover-subitem-text" data-item="${itemId}" data-sub="${s.id}">${escapeHtml(s.text)}</span>
+          <button class="subitem-del" data-action="popover-add-after" data-item="${itemId}" data-sub="${s.id}" title="다음 항목 추가">+</button>
           <button class="subitem-del" data-action="popover-del-subitem" data-item="${itemId}" data-sub="${s.id}" title="삭제">✕</button>
         </div>
       `).join('')}
-      <button type="button" class="subitem-popover-addbtn" data-action="popover-add-subitem" data-item="${itemId}">+ 항목 추가</button>
     `;
+
+    if(subitemPopoverEl.dataset.focusSub){
+      const target = subitemPopoverEl.querySelector(`[data-action="popover-subitem-text"][data-sub="${subitemPopoverEl.dataset.focusSub}"]`);
+      delete subitemPopoverEl.dataset.focusSub;
+      if(target){
+        target.focus();
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
 
     subitemPopoverEl.querySelectorAll('[data-action="popover-subitem-text"]').forEach(el=>{
       el.addEventListener('input', ()=>{
@@ -3730,19 +3768,34 @@
         renderMobile();
       });
     });
-    const addBtn = subitemPopoverEl.querySelector('[data-action="popover-add-subitem"]');
-    if(addBtn){
+    subitemPopoverEl.querySelectorAll('[data-action="popover-add-subitem"]').forEach(addBtn=>{
       addBtn.addEventListener('click', (e)=>{
         e.stopPropagation();
         const item = findItemById(addBtn.dataset.item);
+        const newId = uid();
         if(item){
           if(!item.subitems) item.subitems = [];
-          item.subitems.push({id:uid(), text:''});
+          item.subitems.push({id:newId, text:''});
         }
+        subitemPopoverEl.dataset.focusSub = newId;
         renderSubitemPopoverContent(addBtn.dataset.item);
         renderMobile();
       });
-    }
+    });
+    subitemPopoverEl.querySelectorAll('[data-action="popover-add-after"]').forEach(addBtn=>{
+      addBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const item = findItemById(addBtn.dataset.item);
+        const newId = uid();
+        if(item && item.subitems){
+          const idx = item.subitems.findIndex(s=>s.id===addBtn.dataset.sub);
+          item.subitems.splice(idx+1, 0, {id:newId, text:''});
+        }
+        subitemPopoverEl.dataset.focusSub = newId;
+        renderSubitemPopoverContent(addBtn.dataset.item);
+        renderMobile();
+      });
+    });
     subitemPopoverEl.querySelectorAll('.subitem-bullet[draggable="true"]').forEach(handle=>{
       handle.addEventListener('dragstart', (e)=>{
         draggedSubitem = { itemId: handle.dataset.item, subId: handle.dataset.sub };
@@ -3829,6 +3882,7 @@
   document.addEventListener('click', (e)=>{
     if(subitemPopoverDragging) return;
     if(subitemPopoverMouseDownInside) return; // 클릭이 팝오버 안에서 시작된 상호작용(텍스트 선택 등)이면 무시
+    if(e.target.closest('.planner') || e.target.closest('.calendar-card') || e.target.closest('.memo-card')) return; // PROJECT/캘린더/MEMO 표 안쪽 클릭은 팝오버 유지
     if(subitemPopoverEl.style.display==='block' && !subitemPopoverEl.contains(e.target) && !e.target.closest('.item-expand-btn')){
       closeSubitemPopover();
     }
@@ -7599,14 +7653,30 @@ let favs = [];
 const MEALS = ['아침','점심','저녁','간식'];
 let foodEditIdx = null, exEditIdx = null, itemEditIdx = null;
 let selectedZone = '냉장';
-const SLOT_OPTIONS = {
+const DEFAULT_SLOT_OPTIONS = {
   '냉장': ['소스 칸','문 앞 칸','계란 칸','MY 냉장고'],
-  '냉동': ['위쪽 칸','윗 서랍','아래 서랍','문 안 칸']
+  '냉동': ['위쪽 칸','윗 서랍','아래 서랍','문 안 칸'],
+  '실온': ['선반 칸','과일 바구니','기타']
 };
+let SLOT_OPTIONS = JSON.parse(JSON.stringify(DEFAULT_SLOT_OPTIONS));
 const SLOT_SHORT_LABELS = {
   '소스 칸':'소스', '문 앞 칸':'문 앞', '계란 칸':'계란', 'MY 냉장고':'MY',
-  '위쪽 칸':'윗 칸', '윗 서랍':'서랍(위)', '아래 서랍':'서랍(아래)', '문 안 칸':'문 안'
+  '위쪽 칸':'윗 칸', '윗 서랍':'서랍(위)', '아래 서랍':'서랍(아래)', '문 안 칸':'문 안',
+  '선반 칸':'선반', '과일 바구니':'과일', '기타':'기타'
 };
+async function loadSlotOptions(){
+  try{
+    const saved = await window.storage.get('fridge-slot-options', false);
+    if(saved && saved.value){
+      const parsed = JSON.parse(saved.value);
+      SLOT_OPTIONS = { ...JSON.parse(JSON.stringify(DEFAULT_SLOT_OPTIONS)), ...parsed };
+    }
+  }catch(e){}
+}
+async function saveSlotOptions(){
+  try{ await window.storage.set('fridge-slot-options', JSON.stringify(SLOT_OPTIONS), false); }
+  catch(e){ console.error('slot options save failed', e); }
+}
 
 async function loadDay(dateISO){
   currentDate = dateISO;
@@ -7637,6 +7707,7 @@ function goToday(){ loadDay(toISO(new Date())).then(()=> switchTab('cal')); }
 function shiftDietDay(delta){ loadDay(toISO(addDays(fromISO(currentDate), delta))); }
 
 async function loadGlobal(){
+  await loadSlotOptions();
   try{ const fr = await window.storage.get('diet:fridge:items', false); fridgeItems = fr ? JSON.parse(fr.value) : []; }catch(e){ fridgeItems = []; }
   try{ const fv = await window.storage.get('diet:food:favs', false); favs = fv ? JSON.parse(fv.value) : []; }catch(e){ favs = []; }
   try{
@@ -7648,6 +7719,7 @@ async function loadGlobal(){
       if(d.height) document.getElementById('height').value = d.height;
     }
   }catch(e){}
+  updateSlotSelectOptions();
   renderFridge(); renderFavPanel();
 }
 async function saveFridge(){ try{ await window.storage.set('diet:fridge:items', JSON.stringify(fridgeItems), false); }catch(e){} }
@@ -8010,13 +8082,83 @@ function renderFavPanel(){
   }).join('');
 }
 
-function pickZone(z, keepSlot){
-  selectedZone = z;
-  document.querySelectorAll('#app-diet .zone-btn').forEach(b=>b.classList.toggle('selected', b.dataset.zone===z));
+function openSlotManageModal(){
+  document.getElementById('slotManageTitle').innerHTML = `보관 위치 수정 (${selectedZone}) <button class="modal-close" onclick="closeSlotManageModal()">✕</button>`;
+  document.getElementById('slotManageInput').value = '';
+  renderSlotManageList();
+  document.getElementById('slotManageModal').classList.add('open');
+}
+function closeSlotManageModal(){
+  document.getElementById('slotManageModal').classList.remove('open');
+}
+function renderSlotManageList(){
+  const list = document.getElementById('slotManageList');
+  const opts = SLOT_OPTIONS[selectedZone] || [];
+  if(opts.length===0){
+    list.innerHTML = '<div style="font-size:12px; color:var(--sub);">보관 위치가 없어요</div>';
+    return;
+  }
+  list.innerHTML = opts.map((s,i)=>`
+    <div style="display:flex; align-items:center; gap:6px;">
+      <span class="etext" data-slot-idx="${i}" contenteditable="true" style="flex:1; display:block;">${s}</span>
+      <button class="icon-btn del" onclick="removeSlotOption(${i})" title="삭제">✕</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('[data-slot-idx]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      const idx = +el.dataset.slotIdx;
+      const newName = el.textContent.trim();
+      if(!newName) { renderSlotManageList(); return; }
+      renameSlotOption(idx, newName);
+    });
+  });
+}
+function renameSlotOption(idx, newName){
+  const z = selectedZone;
+  const oldName = SLOT_OPTIONS[z][idx];
+  if(oldName === newName) return;
+  SLOT_OPTIONS[z][idx] = newName;
+  if(SLOT_SHORT_LABELS[oldName] && !SLOT_SHORT_LABELS[newName]){
+    SLOT_SHORT_LABELS[newName] = SLOT_SHORT_LABELS[oldName];
+  }
+  fridgeItems.forEach(it=>{ if(it.zone===z && it.slot===oldName) it.slot = newName; });
+  saveSlotOptions(); saveFridge();
+  updateSlotSelectOptions();
+  renderFridge();
+  renderSlotManageList();
+}
+function addSlotOption(){
+  const input = document.getElementById('slotManageInput');
+  const name = input.value.trim();
+  if(!name) return;
+  const z = selectedZone;
+  if(!SLOT_OPTIONS[z]) SLOT_OPTIONS[z] = [];
+  if(SLOT_OPTIONS[z].includes(name)){ input.value=''; return; }
+  SLOT_OPTIONS[z].push(name);
+  saveSlotOptions();
+  updateSlotSelectOptions();
+  input.value = '';
+  renderSlotManageList();
+}
+function removeSlotOption(idx){
+  const z = selectedZone;
+  SLOT_OPTIONS[z].splice(idx,1);
+  saveSlotOptions();
+  updateSlotSelectOptions();
+  renderSlotManageList();
+}
+
+function updateSlotSelectOptions(keepSlot){
   const slotSel = document.getElementById('itemSlot');
+  const z = selectedZone;
   const prev = keepSlot || slotSel.value;
   slotSel.innerHTML = SLOT_OPTIONS[z].map(s=>`<option value="${s}">${s}</option>`).join('');
   if(prev && SLOT_OPTIONS[z].includes(prev)) slotSel.value = prev;
+}
+function pickZone(z, keepSlot){
+  selectedZone = z;
+  document.querySelectorAll('#app-diet .zone-btn').forEach(b=>b.classList.toggle('selected', b.dataset.zone===z));
+  updateSlotSelectOptions(keepSlot);
 }
 function todayStr(offsetDays){ return toISO(addDays(new Date(), offsetDays||0)); }
 function setDefaultDates(){
@@ -8102,6 +8244,7 @@ function switchZoneTab(z){
   activeZoneTab = z;
   document.getElementById('zoneTabBtn-냉장').classList.toggle('active', z==='냉장');
   document.getElementById('zoneTabBtn-냉동').classList.toggle('active', z==='냉동');
+  document.getElementById('zoneTabBtn-실온').classList.toggle('active', z==='실온');
   renderFridge();
 }
 function renderFridge(){
@@ -8363,6 +8506,10 @@ window.removeFav = removeFav;
 window.saveFavEdit = saveFavEdit;
 window.cancelFavEdit = cancelFavEdit;
 window.pickZone = pickZone;
+window.openSlotManageModal = openSlotManageModal;
+window.closeSlotManageModal = closeSlotManageModal;
+window.addSlotOption = addSlotOption;
+window.removeSlotOption = removeSlotOption;
 window.submitItem = submitItem;
 window.cancelItemEdit = cancelItemEdit;
 window.removeItem = removeItem;
